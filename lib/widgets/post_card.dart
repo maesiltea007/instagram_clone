@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
+import '../models/user.dart';
+import '../data/dummy_users.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
@@ -55,14 +57,18 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildHeader(Post post) {
+    final user = users[post.author]; // ← nickname으로 User 불러오기
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      leading: const CircleAvatar(
+      leading: CircleAvatar(
         radius: 18,
+        backgroundImage: user != null
+            ? NetworkImage(user.profileImageUrl)
+            : null,
         backgroundColor: Colors.grey,
       ),
       title: Text(
-        post.username,
+        post.author,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       trailing: const Icon(Icons.more_vert),
@@ -180,7 +186,7 @@ class _PostCardState extends State<PostCard> {
           style: const TextStyle(color: Colors.black),
           children: [
             TextSpan(
-              text: post.username,
+              text: post.author,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const TextSpan(text: '  '),
