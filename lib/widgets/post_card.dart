@@ -57,7 +57,7 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildHeader(Post post) {
-    final user = users[post.author]; // ← nickname으로 User 불러오기
+    final user = usersById[post.authorid]; // ← id로 User 불러오기
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       leading: CircleAvatar(
@@ -68,7 +68,7 @@ class _PostCardState extends State<PostCard> {
         backgroundColor: Colors.grey,
       ),
       title: Text(
-        post.author,
+        user?.userNickName ?? 'unknown',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       trailing: const Icon(Icons.more_vert),
@@ -179,6 +179,7 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildCaption(Post post) {
+    final user = usersById[post.authorid];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: RichText(
@@ -186,7 +187,7 @@ class _PostCardState extends State<PostCard> {
           style: const TextStyle(color: Colors.black),
           children: [
             TextSpan(
-              text: post.author,
+              text: user?.userNickName ?? 'unknown',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const TextSpan(text: '  '),

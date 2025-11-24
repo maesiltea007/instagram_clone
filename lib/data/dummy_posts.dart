@@ -2,7 +2,7 @@ import 'package:instagram/models/post.dart';
 
 final List<Post> dummyPosts = [
   Post(
-    author: 'sans',
+    authorid: '1',
     caption: 'Wa Sans!!!',
     mediaUrls: [
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKNglWJZDTrJ0lMThJWI6f3bPswwr6MGyjew&s',
@@ -13,7 +13,7 @@ final List<Post> dummyPosts = [
   ),
 
   Post(
-    author: 'steve_jobs',
+    authorid: '2',
     caption: 'Stay hungry, Stay foolish',
     mediaUrls: [
       'https://igotoffer.com/apple/wp-content/uploads/2016/06/iphone-1-bill-gates-600x548.jpg',

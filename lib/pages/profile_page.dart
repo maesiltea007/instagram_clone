@@ -5,19 +5,16 @@ import 'package:instagram/models/post.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
-
   const ProfilePage({super.key, required this.user});
-
   int _getPostCountForUser(User user) {
     return dummyPosts
-        .where((Post post) => post.author == user.userNickName)
+        .where((Post post) => post.authorid == user.id)
         .length;
   }
 
   @override
   Widget build(BuildContext context) {
     final postCount = _getPostCountForUser(user);
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +40,6 @@ class ProfilePage extends StatelessWidget {
             backgroundImage: NetworkImage(user.profileImageUrl),
           ),
           const SizedBox(width: 30),
-
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

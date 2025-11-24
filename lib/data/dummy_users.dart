@@ -1,16 +1,18 @@
 import '../models/user.dart';
 
 // 로그인된 유저(현재 사용자)
-User currentUser = link;
+User currentUser = user3;
 
 //유저 매핑
-final Map<String, User> users = {
-  'sans': sans,
-  'steve_jobs': steve_jobs,
+final Map<String, User> usersById = {
+  '1': user1,
+  '2': user2,
+  '3': user3,
+
 };
 
 //유저 더미 데이터
-const User sans = User(
+const User user1 = User(
   id: '1',
   userNickName: 'sans',
   userName: 'Sans',
@@ -21,7 +23,7 @@ const User sans = User(
   followingCount: 10,
 );
 
-const User steve_jobs = User(
+const User user2 = User(
   id: '2',
   userNickName: 'steve_jobs',
   userName: 'Steve Jobs',
@@ -32,7 +34,7 @@ const User steve_jobs = User(
   followingCount: 1,
 );
 
-const User link = User(
+const User user3 = User(
   id: '3',
   userNickName: 'link',
   userName: 'Link',
