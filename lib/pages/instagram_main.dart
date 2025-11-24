@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/widgets/post_card.dart';
-import 'package:instagram/data/dummy_posts.dart';
+import 'package:instagram/pages/feed_page.dart';
 
 class InstagramMain extends StatefulWidget {
   const InstagramMain({super.key, required this.title});
@@ -25,7 +24,6 @@ class _InstagramMainState extends State<InstagramMain> {
       );
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -35,9 +33,7 @@ class _InstagramMainState extends State<InstagramMain> {
           onPressed: () {},
         ),
         elevation: 1,
-        backgroundColor: Theme
-            .of(context)
-            .canvasColor,
+        backgroundColor: Theme.of(context).canvasColor,
         title: Text(
           widget.title,
           style: const TextStyle(color: Colors.black),
@@ -50,18 +46,8 @@ class _InstagramMainState extends State<InstagramMain> {
         ],
       ),
 
-      body: ListView.builder(
-        itemCount: dummyPosts.length,
-        itemBuilder: (context, index) {
-          final post = dummyPosts[index];
-          return PostCard(
-            post: post,
-            onCommentTap: () {
-              // 나중에 좋아요 등 기능 추가할 곳
-            },
-          );
-        },
-      ),
+      // 🔥 여기만 FeedPage로 교체
+      body: const FeedPage(),
 
       bottomNavigationBar: BottomAppBar(
         child: Row(
