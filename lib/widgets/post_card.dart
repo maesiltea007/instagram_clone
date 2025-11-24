@@ -70,36 +70,38 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildMedia(Post post) {
-    // 동영상 자리 (지금은 플레이 아이콘만)
+    // 동영상 자리 (지금은 플레이 아이콘만) - 1:1 정사각형
     if (post.isVideo) {
-      return Container(
-        height: 350,
-        color: Colors.black12,
-        child: const Center(
-          child: Icon(
-            Icons.play_arrow,
-            size: 64,
+      return AspectRatio(
+        aspectRatio: 1, // 1:1
+        child: Container(
+          color: Colors.black12,
+          child: const Center(
+            child: Icon(
+              Icons.play_arrow,
+              size: 64,
+            ),
           ),
         ),
       );
     }
 
-    // 사진 1장
+    // 사진 1장 - 1:1 정사각형
     if (post.mediaUrls.length == 1) {
-      return Image.network(
-        post.mediaUrls.first,
-        height: 350,
-        width: double.infinity,
-        fit: BoxFit.cover,
+      return AspectRatio(
+        aspectRatio: 1, // 1:1
+        child: Image.network(
+          post.mediaUrls.first,
+          fit: BoxFit.cover,
+        ),
       );
     }
 
-    // 사진 여러 장 -> 가로 슬라이드
+    // 사진 여러 장 -> 가로 슬라이드 + 1:1
     return Stack(
       children: [
-        SizedBox(
-          height: 350,
-          width: double.infinity,
+        AspectRatio(
+          aspectRatio: 1, // 1:1
           child: PageView.builder(
             controller: _pageController,
             itemCount: post.mediaUrls.length,
@@ -114,7 +116,6 @@ class _PostCardState extends State<PostCard> {
             },
           ),
         ),
-        // 오른쪽 위에 "1/3" 표시
         Positioned(
           right: 8,
           top: 8,
