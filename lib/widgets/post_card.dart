@@ -93,11 +93,11 @@ class _PostCardState extends State<PostCard> {
     }
 
     // 사진 1장 - 1:1 정사각형
-    if (post.mediaUrls.length == 1) {
+    if (post.mediaPaths.length == 1) {
       return AspectRatio(
         aspectRatio: 1, // 1:1
-        child: Image.network(
-          post.mediaUrls.first,
+        child: Image.asset(
+          post.mediaPaths.first,
           fit: BoxFit.cover,
         ),
       );
@@ -110,13 +110,13 @@ class _PostCardState extends State<PostCard> {
           aspectRatio: 1, // 1:1
           child: PageView.builder(
             controller: _pageController,
-            itemCount: post.mediaUrls.length,
+            itemCount: post.mediaPaths.length,
             onPageChanged: (idx) {
               setState(() => _currentPage = idx);
             },
             itemBuilder: (context, index) {
-              return Image.network(
-                post.mediaUrls[index],
+              return Image.asset(
+                post.mediaPaths[index],
                 fit: BoxFit.cover,
               );
             },
@@ -132,7 +132,7 @@ class _PostCardState extends State<PostCard> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              '${_currentPage + 1}/${post.mediaUrls.length}',
+              '${_currentPage + 1}/${post.mediaPaths.length}',
               style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
           ),
