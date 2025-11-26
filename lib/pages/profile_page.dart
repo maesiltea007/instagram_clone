@@ -66,7 +66,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// bio 줄
   Widget _buildUserInfo(User user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,46 +82,54 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// Edit profile / Share profile / 사람 아이콘 버튼
   Widget _buildButtonsRow() {
+    final Color bg = const Color(0xFFEFEFEF);      // 연한 회색 배경 (인스타 느낌)
+    final Color border = const Color(0xFFDBDBDB);  // 더 연한 테두리
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           // Edit profile
           Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // 너무 동글지 않게
-                ),
+            child: Container(
+              height: 32,
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: border),
               ),
-              child: const Text(
-                'Edit profile',
-                style: TextStyle(fontSize: 14),
+              child: TextButton(
+                onPressed: () {},
+                child: const Text(
+                  'Edit profile',
+                  style: TextStyle(color: Colors.black, fontSize: 14),
+                ),
               ),
             ),
           ),
+
           const SizedBox(width: 8),
 
           // Share profile
           Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            child: Container(
+              height: 32,
+              decoration: BoxDecoration(
+                color: bg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: border),
               ),
-              child: const Text(
-                'Share profile',
-                style: TextStyle(fontSize: 14),
+              child: TextButton(
+                onPressed: () {},
+                child: const Text(
+                  'Share profile',
+                  style: TextStyle(color: Colors.black, fontSize: 14),
+                ),
               ),
             ),
           ),
+
           const SizedBox(width: 8),
 
           // 사람 아이콘 버튼
@@ -130,16 +137,13 @@ class ProfilePage extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
+              color: bg,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade400),
-              color: Colors.white,
+              border: Border.all(color: border),
             ),
             child: IconButton(
               padding: EdgeInsets.zero,
-              icon: const Icon(
-                Icons.person_add_outlined,
-                size: 18,
-              ),
+              icon: const Icon(Icons.person_add_outlined, size: 18, color: Colors.black),
               onPressed: () {},
             ),
           ),
