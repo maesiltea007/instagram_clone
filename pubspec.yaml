@@ -58,10 +58,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/images/other_images/
+    - assets/images/profile_images/
     - assets/images/post_images/
     - assets/videos/
     - assets/dummy_device/images/
+    - assets/images/album_covers/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

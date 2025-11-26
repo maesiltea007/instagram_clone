@@ -25,7 +25,7 @@ const User user0 = User(
   userNickName: 'ta_junhyuk',
   userName: 'puang',
   profileImagePath:
-  'assets/images/other_images/puang_profile_image.jpg',
+  'assets/images/profile_images/puang_profile_image.jpg',
   bio: 'I will be the god of flutter',
   followerCount: 1200,
   followingCount: 10,
@@ -37,7 +37,7 @@ const User user1 = User(
   userNickName: 'aespa_official',
   userName: 'Aespa',
   profileImagePath:
-  'assets/images/other_images/aespa_logo.jpg',
+  'assets/images/profile_images/aespa_logo.jpg',
   bio: 'Wa! Sans! Do you know!',
   followerCount: 1200,
   followingCount: 10,
@@ -49,7 +49,7 @@ const User user2 = User(
   userNickName: 'katarinabluu',
   userName: 'Karina',
   profileImagePath:
-  'assets/images/other_images/karina_profile.jpg',
+  'assets/images/profile_images/karina_profile.jpg',
   bio: 'hello my name is karina. how are you.',
   followerCount: 1000000,
   followingCount: 1,
@@ -61,7 +61,7 @@ const User user3 = User(
   userNickName: 'kingshot_mobile',
   userName: 'kingshot_mobile',
   profileImagePath:
-  'assets/images/other_images/kingshot_mobile_profile.jpg',
+  'assets/images/profile_images/kingshot_mobile_profile.jpg',
   bio: '',
   followerCount: 1000000,
   followingCount: 1,
@@ -73,7 +73,7 @@ const User user4 = User(
   userNickName: 'akmu_suhyun',
   userName: 'suhyun',
   profileImagePath:
-  'assets/images/other_images/akmu_suhyun_profile.jpg',
+  'assets/images/profile_images/akmu_suhyun_profile.jpg',
   bio: '',
   followerCount: 1000000,
   followingCount: 1,
@@ -85,7 +85,7 @@ const User user5 = User(
   userNickName: 'hotelsdotcom',
   userName: 'hotel',
   profileImagePath:
-  'assets/images/other_images/hotelsdotcom_logo.jpg',
+  'assets/images/profile_images/hotelsdotcom_logo.jpg',
   bio: '',
   followerCount: 100,
   followingCount: 1,
@@ -97,7 +97,7 @@ const User user6 = User(
   userNickName: 'imwinter',
   userName: 'winter',
   profileImagePath:
-  'assets/images/other_images/winter_profile.jpg',
+  'assets/images/profile_images/winter_profile.jpg',
   bio: '',
   followerCount: 1000000,
   followingCount: 1,
@@ -109,7 +109,7 @@ const User user7 = User(
   userNickName: 'aespa_fan',
   userName: 'comment',
   profileImagePath:
-  'assets/images/other_images/default_user_image.jpg',
+  'assets/images/profile_images/default_user_image.jpg',
   bio: '',
   followerCount: 1,
   followingCount: 1,
@@ -121,7 +121,7 @@ const User user8 = User(
   userNickName: 'karina_fan',
   userName: 'comment',
   profileImagePath:
-  'assets/images/other_images/default_user_image.jpg',
+  'assets/images/profile_images/default_user_image.jpg',
   bio: '',
   followerCount: 1,
   followingCount: 1,
@@ -133,7 +133,7 @@ const User user9 = User(
   userNickName: 'winter_fan',
   userName: 'comment',
   profileImagePath:
-  'assets/images/other_images/default_user_image.jpg',
+  'assets/images/profile_images/default_user_image.jpg',
   bio: '',
   followerCount: 1,
   followingCount: 1,

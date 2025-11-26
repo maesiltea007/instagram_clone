@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../pages/post_page.dart';
+
 class CreateBottomSheet extends StatelessWidget {
   const CreateBottomSheet({super.key});
 
@@ -61,7 +63,12 @@ class CreateBottomSheet extends StatelessWidget {
             icon: Icons.grid_on_outlined,
             label: 'Post',
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // 바텀시트 닫고
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const PostPage(),
+                ),
+              );
             },
           ),
 
