@@ -9,14 +9,26 @@ final List<Post> dummyPosts = [
       'assets/videos/naruto_dance.mp4',
     ],
     isVideo: true,
-    likeCount: 32,
+    likeCount: 90000,
     createdAt: DateTime(2025, 11, 26),
+  ),
+
+  //킹샷모바일 광고
+  Post(
+    authorid: '3',
+    caption: 'defeat and be number 1!!',
+    mediaPaths: [
+      'assets/videos/kingshot_ad.mp4',
+    ],
+    isVideo: true,
+    likeCount: 3120,
+    createdAt: DateTime(2025, 11, 5),
   ),
 
   //카리나 얼굴 이미지 포스트
   Post(
     authorid: '2',
-    caption: 'hello I am Karina',
+    caption: 'pradak chicken',
     mediaPaths: [
       'assets/images/post_images/karinabluu_1.jpg',
       'assets/images/post_images/karinabluu_2.jpg',
@@ -27,9 +39,44 @@ final List<Post> dummyPosts = [
       'assets/images/post_images/karinabluu_7.jpg',
       'assets/images/post_images/karinabluu_8.jpg',
     ],
-    likeCount: 81,
+    likeCount: 100000,
     createdAt: DateTime(2025, 11, 20),
   ),
 
-  // 동영상 더미 나중에 추가해보기
+  //악뮤 수현 순례길 포스트
+  Post(
+    authorid: '4',
+    caption: 'my second sunrye road\nsun, wind, friends, I love it',
+    mediaPaths: [
+      'assets/images/post_images/akmu_suhyun_1.jpg',
+      'assets/images/post_images/akmu_suhyun_2.jpg',
+    ],
+    likeCount: 100000,
+    createdAt: DateTime(2025, 11, 20),
+  ),
+
+  //호텔스닷컴 광고
+  Post(
+    authorid: '5',
+    caption: 'hotelsdotcom advertisement\nhotel good price cheap',
+    mediaPaths: [
+      'assets/images/post_images/hotelsdotcom.jpg',
+    ],
+    likeCount: 777,
+    createdAt: DateTime(2025, 10, 20),
+  ),
+
+  //윈터 얼굴 게시물
+  Post(
+    authorid: '6',
+    caption: 'lovely',
+    mediaPaths: [
+      'assets/images/post_images/winter_1.jpg',
+      'assets/images/post_images/winter_2.jpg',
+      'assets/images/post_images/winter_3.jpg',
+      'assets/images/post_images/winter_4.jpg',
+    ],
+    likeCount: 77777,
+    createdAt: DateTime(2025, 10, 20),
+  ),
 ];
