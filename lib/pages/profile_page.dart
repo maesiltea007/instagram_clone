@@ -5,25 +5,26 @@ import 'package:instagram/models/post.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
+
   const ProfilePage({super.key, required this.user});
+
   int _getPostCountForUser(User user) {
-    return dummyPosts
-        .where((Post post) => post.authorid == user.id)
-        .length;
+    return dummyPosts.where((Post post) => post.authorid == user.id).length;
   }
 
   @override
   Widget build(BuildContext context) {
     final postCount = _getPostCountForUser(user);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(user, postCount),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildUserInfo(user),
           const SizedBox(height: 12),
-          _buildEditButton(),
+          _buildButtonsRow(),
           const SizedBox(height: 20),
         ],
       ),
@@ -34,19 +35,29 @@ class ProfilePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 프로필 이미지
           CircleAvatar(
-            radius: 45,
-            backgroundImage: NetworkImage(user.profileImagePath),
+            radius: 40,
+            backgroundImage: AssetImage(user.profileImagePath),
           ),
-          const SizedBox(width: 30),
+          const SizedBox(width: 20),
+
+          // 통계 영역
           Expanded(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _StatItem(label: 'posts', count: postCount),
-                _StatItem(label: 'followers', count: user.followerCount),
-                _StatItem(label: 'followings', count: user.followingCount),
+                Expanded(
+                  child: _StatItem(label: 'posts', count: postCount),
+                ),
+                Expanded(
+                  child: _StatItem(label: 'followers', count: user.followerCount),
+                ),
+                Expanded(
+                  child: _StatItem(label: 'following', count: user.followingCount),
+                ),
               ],
             ),
           ),
@@ -55,32 +66,81 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  /// bio 줄
   Widget _buildUserInfo(User user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            user.userName,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          if (user.bio.isNotEmpty) Text(user.bio),
+          if (user.bio.isNotEmpty)
+            Text(
+              user.bio,
+              style: const TextStyle(fontSize: 14),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildEditButton() {
+  /// Edit profile / Share profile / 사람 아이콘 버튼
+  Widget _buildButtonsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
+          // Edit profile
           Expanded(
             child: OutlinedButton(
               onPressed: () {},
-              child: const Text('Edit Profile'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // 너무 동글지 않게
+                ),
+              ),
+              child: const Text(
+                'Edit profile',
+                style: TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Share profile
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () {},
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Share profile',
+                style: TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // 사람 아이콘 버튼
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade400),
+              color: Colors.white,
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(
+                Icons.person_add_outlined,
+                size: 18,
+              ),
+              onPressed: () {},
             ),
           ),
         ],
@@ -98,15 +158,24 @@ class _StatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           count.toString(),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
-        Text(label),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
       ],
     );
   }
