@@ -5,18 +5,23 @@ final List<Post> dummyPosts = [
     authorid: '1',
     caption: 'Wa Sans!!!',
     mediaPaths: [
-      'assets/images/sans_in_castle.jpg',
-      'assets/images/sleeping_sans.jpg',
-      'assets/images/smile_sans.jpg',
+      'assets/images/post_images',
     ],
     likeCount: 32,
   ),
 
   Post(
     authorid: '2',
-    caption: 'Stay hungry, Stay foolish',
+    caption: 'hello I am Karina',
     mediaPaths: [
-      'assets/images/iphone_on_hand.jpg',
+      'assets/images/post_images/karinabluu_1.jpg',
+      'assets/images/post_images/karinabluu_2.jpg',
+      'assets/images/post_images/karinabluu_3.jpg',
+      'assets/images/post_images/karinabluu_4.jpg',
+      'assets/images/post_images/karinabluu_5.jpg',
+      'assets/images/post_images/karinabluu_6.jpg',
+      'assets/images/post_images/karinabluu_7.jpg',
+      'assets/images/post_images/karinabluu_8.jpg',
     ],
     likeCount: 81,
   ),

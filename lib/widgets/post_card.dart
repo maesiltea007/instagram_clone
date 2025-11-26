@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
-import '../models/user.dart';
 import '../data/dummy_users.dart';
 
 class PostCard extends StatefulWidget {
@@ -63,7 +62,7 @@ class _PostCardState extends State<PostCard> {
       leading: CircleAvatar(
         radius: 18,
         backgroundImage: user != null
-            ? NetworkImage(user.profileImageUrl)
+            ? AssetImage(user.profileImagePath)
             : null,
         backgroundColor: Colors.grey,
       ),
