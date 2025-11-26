@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
-import '../data/dummy_users.dart';
+import 'package:instagram/data/dummy_users.dart';
 
-class PostCard extends StatefulWidget {
+class ImagePostCard extends StatefulWidget {
   final Post post;
-  final VoidCallback? onCommentTap; // 댓글 버튼 눌렀을 때 동작 (페이지 이동 등)
+  final VoidCallback? onCommentTap;
 
-  const PostCard({
+  const ImagePostCard({
     super.key,
     required this.post,
     this.onCommentTap,
   });
 
   @override
-  State<PostCard> createState() => _PostCardState();
+  State<ImagePostCard> createState() => _ImagePostCardState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _ImagePostCardState extends State<ImagePostCard> {
   late final PageController _pageController;
   int _currentPage = 0;
 
@@ -56,14 +56,14 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildHeader(Post post) {
-    final user = usersById[post.authorid]; // ← id로 User 불러오기
+    final user = usersById[post.authorid];
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       leading: CircleAvatar(
         radius: 18,
-        backgroundImage: user != null
-            ? AssetImage(user.profileImagePath)
-            : null,
+        backgroundImage:
+        user != null ? AssetImage(user.profileImagePath) : null,
         backgroundColor: Colors.grey,
       ),
       title: Text(
@@ -75,26 +75,10 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildMedia(Post post) {
-    // 동영상 자리 (지금은 플레이 아이콘만) - 1:1 정사각형
-    if (post.isVideo) {
-      return AspectRatio(
-        aspectRatio: 1, // 1:1
-        child: Container(
-          color: Colors.black12,
-          child: const Center(
-            child: Icon(
-              Icons.play_arrow,
-              size: 64,
-            ),
-          ),
-        ),
-      );
-    }
-
-    // 사진 1장 - 1:1 정사각형
+    // 사진 1장일 때는 카운터 없어야 함
     if (post.mediaPaths.length == 1) {
       return AspectRatio(
-        aspectRatio: 1, // 1:1
+        aspectRatio: 1,
         child: Image.asset(
           post.mediaPaths.first,
           fit: BoxFit.cover,
@@ -102,12 +86,11 @@ class _PostCardState extends State<PostCard> {
       );
     }
 
-    // 사진 여러 장 -> 가로 슬라이드 + 1:1
-    return Stack(
-      children: [
-        AspectRatio(
-          aspectRatio: 1, // 1:1
-          child: PageView.builder(
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Stack(
+        children: [
+          PageView.builder(
             controller: _pageController,
             itemCount: post.mediaPaths.length,
             onPageChanged: (idx) {
@@ -120,49 +103,91 @@ class _PostCardState extends State<PostCard> {
               );
             },
           ),
-        ),
-        Positioned(
-          right: 8,
-          top: 8,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '${_currentPage + 1}/${post.mediaPaths.length}',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+
+          Positioned(
+            right: 12,
+            top: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_currentPage + 1}/${post.mediaPaths.length}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPageIndicator(int length) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(length, (index) {
+        final bool isActive = index == _currentPage;
+        return Container(
+          width: 6,
+          height: 6,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive ? Colors.blueGrey.shade900 : Colors.grey.shade400,
+          ),
+        );
+      }),
     );
   }
 
   Widget _buildActions() {
-    return Row(
+    final post = widget.post;
+    final hasMultiple = post.mediaPaths.length > 1;
+
+    return Stack(
+      alignment: Alignment.center,
       children: [
-        IconButton(
-          icon: Icon(
-            _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.red : null,
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(
+                _isLiked ? Icons.favorite : Icons.favorite_border,
+                color: _isLiked ? Colors.red : null,
+              ),
+              onPressed: _toggleLike,
+            ),
+            IconButton(
+              icon: const Icon(Icons.chat_bubble_outline),
+              onPressed: widget.onCommentTap ?? () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.repeat),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: () {},
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.bookmark_border),
+              onPressed: () {},
+            ),
+          ],
+        ),
+
+        // 여러 장일 때만 가운데 인디케이터
+        if (hasMultiple)
+          IgnorePointer(
+            ignoring: true,
+            child: _buildPageIndicator(post.mediaPaths.length),
           ),
-          onPressed: _toggleLike,
-        ),
-        IconButton(
-          icon: const Icon(Icons.comment_outlined),
-          onPressed: widget.onCommentTap ?? () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.send_outlined),
-          onPressed: () {},
-        ),
-        const Spacer(),
-        IconButton(
-          icon: const Icon(Icons.bookmark_border),
-          onPressed: () {},
-        ),
       ],
     );
   }
@@ -171,7 +196,7 @@ class _PostCardState extends State<PostCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Text(
-        '좋아요 $_likeCount개',
+        '$_likeCount likes',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
@@ -179,6 +204,7 @@ class _PostCardState extends State<PostCard> {
 
   Widget _buildCaption(Post post) {
     final user = usersById[post.authorid];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: RichText(

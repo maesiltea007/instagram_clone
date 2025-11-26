@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/widgets/post_card.dart';
+import 'package:instagram/widgets/post_cards/post_card.dart';
 import 'package:instagram/data/dummy_posts.dart';
 
 class FeedPage extends StatelessWidget {

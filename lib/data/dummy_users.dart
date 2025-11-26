@@ -29,7 +29,7 @@ const User user2 = User(
   userName: 'Karina',
   profileImagePath:
   'assets/images/other_images/karina_profile.jpg',
-  bio: 'think different',
+  bio: 'hello my name is karina. how are you.',
   followerCount: 1000000,
   followingCount: 1,
 );
