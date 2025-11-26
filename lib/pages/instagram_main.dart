@@ -74,12 +74,27 @@ class _InstagramMainState extends State<InstagramMain> {
           children: <Widget>[
             _buildBottomTab(0, Icons.home),
             _buildBottomTab(1, Icons.search),
-            _buildBottomTab(2, Icons.add_box),
-            _buildBottomTab(3, Icons.favorite),
-            _buildBottomTab(4, Icons.account_circle),
+            _buildBottomTab(2, Icons.add_box_outlined),
+            _buildBottomTab(3, Icons.smart_display_outlined),
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  setState(() => _currentIndex = 4);
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundImage: AssetImage(currentUser.profileImagePath),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
+      )
     );
   }
 }
