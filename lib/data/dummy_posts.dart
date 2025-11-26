@@ -1,15 +1,18 @@
 import 'package:instagram/models/post.dart';
 
 final List<Post> dummyPosts = [
+  //에스파 춤추는 릴스 포스트
   Post(
     authorid: '1',
-    caption: 'Wa Sans!!!',
+    caption: 'Ouch!',
     mediaPaths: [
-      'assets/images/post_images',
+      'assets/videos/naruto_dance.mp4',
     ],
+    isVideo: true,
     likeCount: 32,
   ),
 
+  //카리나 얼굴 이미지 포스트
   Post(
     authorid: '2',
     caption: 'hello I am Karina',

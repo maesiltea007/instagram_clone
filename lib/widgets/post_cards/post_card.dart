@@ -17,14 +17,12 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (post.isVideo) {
-      // 비디오 전용 카드 (지금은 TODO 상태)
       return VideoPostCard(
         post: post,
         onCommentTap: onCommentTap,
       );
     }
 
-    // 이미지 전용 카드
     return ImagePostCard(
       post: post,
       onCommentTap: onCommentTap,
