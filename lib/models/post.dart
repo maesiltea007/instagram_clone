@@ -7,6 +7,7 @@ class Post {
   final List<String> mediaPaths; // 사진 여러 장
   final bool isVideo;
   final int likeCount;
+  final DateTime createdAt;
 
   const Post({
     required this.authorid,
@@ -14,5 +15,6 @@ class Post {
     required this.mediaPaths,
     this.isVideo = false,
     this.likeCount = 0,
+    required this.createdAt,
   });
 }

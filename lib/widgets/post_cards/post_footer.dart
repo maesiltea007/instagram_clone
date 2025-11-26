@@ -100,6 +100,18 @@ class PostFooter extends StatelessWidget {
             ),
           ),
         ),
+
+        // 날짜 (예: "5 days ago")
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            _timeAgo(post.createdAt),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -120,5 +132,32 @@ class PostFooter extends StatelessWidget {
         );
       }),
     );
+  }
+
+  String _timeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+
+    if (diff.inDays >= 365) {
+      final years = diff.inDays ~/ 365;
+      return years == 1 ? '1 year ago' : '$years years ago';
+    } else if (diff.inDays >= 30) {
+      final months = diff.inDays ~/ 30;
+      return months == 1 ? '1 month ago' : '$months months ago';
+    } else if (diff.inDays >= 7) {
+      final weeks = diff.inDays ~/ 7;
+      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+    } else if (diff.inDays >= 1) {
+      final days = diff.inDays;
+      return days == 1 ? '1 day ago' : '$days days ago';
+    } else if (diff.inHours >= 1) {
+      final hours = diff.inHours;
+      return hours == 1 ? '1 hour ago' : '$hours hours ago';
+    } else if (diff.inMinutes >= 1) {
+      final mins = diff.inMinutes;
+      return mins == 1 ? '1 minute ago' : '$mins minutes ago';
+    } else {
+      return 'Just now';
+    }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
-
 import 'image_post_card.dart';
 import 'video_post_card.dart';
 

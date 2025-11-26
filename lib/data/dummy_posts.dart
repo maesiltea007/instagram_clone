@@ -10,6 +10,7 @@ final List<Post> dummyPosts = [
     ],
     isVideo: true,
     likeCount: 32,
+    createdAt: DateTime(2025, 11, 26),
   ),
 
   //카리나 얼굴 이미지 포스트
@@ -27,6 +28,7 @@ final List<Post> dummyPosts = [
       'assets/images/post_images/karinabluu_8.jpg',
     ],
     likeCount: 81,
+    createdAt: DateTime(2025, 11, 20),
   ),
 
   // 동영상 더미 나중에 추가해보기
