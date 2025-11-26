@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/data/dummy_users.dart';
+import 'package:instagram/data/dummy_comments.dart';
 
 class PostFooter extends StatelessWidget {
   final Post post;
@@ -9,7 +10,6 @@ class PostFooter extends StatelessWidget {
   final VoidCallback onToggleLike;
   final VoidCallback? onCommentTap;
 
-  // 여러 장일 때만 쓰는 인디케이터 옵션
   final bool showIndicator;
   final int currentPage;
   final int totalPages;
@@ -31,10 +31,15 @@ class PostFooter extends StatelessWidget {
     final user = usersById[post.authorid];
     final hasMultiple = showIndicator && totalPages > 1;
 
+    final comments = commentsByPostId[post.id] ?? [];
+    final topComment = comments.isNotEmpty ? comments.first : null;
+    final topUser =
+    topComment != null ? usersById[topComment.authorId] : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 액션 + 가운데 인디케이터
+        // Action bar + indicator
         Stack(
           alignment: Alignment.center,
           children: [
@@ -74,7 +79,7 @@ class PostFooter extends StatelessWidget {
           ],
         ),
 
-        // likes
+        // Likes count
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
@@ -101,9 +106,43 @@ class PostFooter extends StatelessWidget {
           ),
         ),
 
-        // 날짜 (예: "5 days ago")
+        if (topComment != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 댓글 텍스트
+                Expanded(
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: const TextStyle(color: Colors.black),
+                      children: [
+                        TextSpan(
+                          text: topUser?.userNickName ?? 'unknown',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(text: '  '),
+                        TextSpan(text: topComment.text),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // 오른쪽 하트 아이콘 (더미)
+                Icon(
+                  Icons.favorite_border,
+                  size: 18,
+                  color: Colors.grey.shade600,
+                ),
+              ],
+            ),
+          ),
+
+        // Date
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Text(
             _timeAgo(post.createdAt),
             style: const TextStyle(
@@ -138,26 +177,12 @@ class PostFooter extends StatelessWidget {
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
-    if (diff.inDays >= 365) {
-      final years = diff.inDays ~/ 365;
-      return years == 1 ? '1 year ago' : '$years years ago';
-    } else if (diff.inDays >= 30) {
-      final months = diff.inDays ~/ 30;
-      return months == 1 ? '1 month ago' : '$months months ago';
-    } else if (diff.inDays >= 7) {
-      final weeks = diff.inDays ~/ 7;
-      return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
-    } else if (diff.inDays >= 1) {
-      final days = diff.inDays;
-      return days == 1 ? '1 day ago' : '$days days ago';
-    } else if (diff.inHours >= 1) {
-      final hours = diff.inHours;
-      return hours == 1 ? '1 hour ago' : '$hours hours ago';
-    } else if (diff.inMinutes >= 1) {
-      final mins = diff.inMinutes;
-      return mins == 1 ? '1 minute ago' : '$mins minutes ago';
-    } else {
-      return 'Just now';
-    }
+    if (diff.inDays >= 365) return '${diff.inDays ~/ 365} years ago';
+    if (diff.inDays >= 30) return '${diff.inDays ~/ 30} months ago';
+    if (diff.inDays >= 7) return '${diff.inDays ~/ 7} weeks ago';
+    if (diff.inDays >= 1) return '${diff.inDays} days ago';
+    if (diff.inHours >= 1) return '${diff.inHours} hours ago';
+    if (diff.inMinutes >= 1) return '${diff.inMinutes} minutes ago';
+    return 'Just now';
   }
 }

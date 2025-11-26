@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './user.dart';
 
 class Post {
+  final String id;
   final String authorid; //userNickName
   final String caption;
   final List<String> mediaPaths; // 사진 여러 장
@@ -10,6 +11,7 @@ class Post {
   final DateTime createdAt;
 
   const Post({
+    required this.id,
     required this.authorid,
     required this.caption,
     required this.mediaPaths,

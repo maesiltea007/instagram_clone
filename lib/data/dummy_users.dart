@@ -12,6 +12,9 @@ final Map<String, User> usersById = {
   '4': user4, //악뮤수현
   '5': user5, //호텔스닷컴
   '6': user6, //윈터
+  '7': user7, //춤추는 영상에 댓글 다는 계정
+  '8': user8, //카리나에 댓글 다는 계정
+  '9': user9, //윈터에 댓글 다는 계정
 };
 
 //유저 더미 데이터
@@ -90,12 +93,48 @@ const User user5 = User(
 
 //윈터 계정
 const User user6 = User(
-  id: '5',
+  id: '6',
   userNickName: 'imwinter',
   userName: 'winter',
   profileImagePath:
   'assets/images/other_images/winter_profile.jpg',
   bio: '',
   followerCount: 1000000,
+  followingCount: 1,
+);
+
+//춤추는 영상에 댓글 다는 계정
+const User user7 = User(
+  id: '7',
+  userNickName: 'aespa_fan',
+  userName: 'comment',
+  profileImagePath:
+  'assets/images/other_images/default_user_image.jpg',
+  bio: '',
+  followerCount: 1,
+  followingCount: 1,
+);
+
+//카리나 사진에 댓글 다는 계정
+const User user8 = User(
+  id: '8',
+  userNickName: 'karina_fan',
+  userName: 'comment',
+  profileImagePath:
+  'assets/images/other_images/default_user_image.jpg',
+  bio: '',
+  followerCount: 1,
+  followingCount: 1,
+);
+
+//윈터 사진에 댓글 다는 계정
+const User user9 = User(
+  id: '9',
+  userNickName: 'winter_fan',
+  userName: 'comment',
+  profileImagePath:
+  'assets/images/other_images/default_user_image.jpg',
+  bio: '',
+  followerCount: 1,
   followingCount: 1,
 );
