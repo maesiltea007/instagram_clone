@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/data/dummy_users.dart';
+import 'post_footer.dart';
 
 class VideoPostCard extends StatefulWidget {
   final Post post;
@@ -60,6 +61,13 @@ class _VideoPostCardState extends State<VideoPostCard> {
     _isMuted = !_isMuted;
     _controller.setVolume(_isMuted ? 0 : 1);
     setState(() {});
+  }
+
+  void _toggleLike() {
+    setState(() {
+      _isLiked = !_isLiked;
+      _likeCount += _isLiked ? 1 : -1;
+    });
   }
 
   @override
@@ -173,121 +181,19 @@ class _VideoPostCardState extends State<VideoPostCard> {
           ),
         ),
 
-        // ───────── 이미지 포스트와 같은 영역들 ─────────
-        _buildActions(),
-        _buildLikes(),
-        _buildCaption(post),
+        // ───────── 이미지 포스트와 같은 Footer (공통) ─────────
+        PostFooter(
+          post: post,
+          isLiked: _isLiked,
+          likeCount: _likeCount,
+          onToggleLike: _toggleLike,
+          onCommentTap: widget.onCommentTap,
+          showIndicator: false, // 비디오는 인디케이터 없음
+          currentPage: 0,
+          totalPages: 0,
+        ),
         const SizedBox(height: 12),
       ],
     );
-  }
-
-  Widget _buildActions() {
-    final post = widget.post;
-    final hasMultiple = post.mediaPaths.length > 1;
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                _isLiked ? Icons.favorite : Icons.favorite_border,
-                color: _isLiked ? Colors.red : null,
-              ),
-              onPressed: _toggleLike,
-            ),
-            IconButton(
-              icon: const Icon(Icons.chat_bubble_outline),
-              onPressed: widget.onCommentTap ?? () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.repeat),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {},
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.bookmark_border),
-              onPressed: () {},
-            ),
-          ],
-        ),
-
-        // 여러 장일 때만 가운데 인디케이터
-        if (hasMultiple)
-          IgnorePointer(
-            ignoring: true,
-            child: _buildPageIndicator(post.mediaPaths.length),
-          ),
-      ],
-    );
-  }
-
-  // 비디오도 혹시 여러 개 붙이는 경우 대비해서 그대로 둠
-  Widget _buildPageIndicator(int length) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(length, (index) {
-        // 이 클래스에서는 _currentPage 없으니까
-        // 전부 흐릿하게만 두거나, 필요하면 나중에 상태 추가해서 맞춰라.
-        return Container(
-          width: 6,
-          height: 6,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.shade400,
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildLikes() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Text(
-        '$_likeCount likes',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildCaption(Post post) {
-    final user = usersById[post.authorid];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(color: Colors.black),
-          children: [
-            TextSpan(
-              text: user?.userNickName ?? 'unknown',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const TextSpan(text: '  '),
-            TextSpan(text: post.caption),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _toggleLike() {
-    setState(() {
-      if (_isLiked) {
-        _isLiked = false;
-        _likeCount -= 1;
-      } else {
-        _isLiked = true;
-        _likeCount += 1;
-      }
-    });
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/data/dummy_users.dart';
+import 'post_footer.dart';
 
 class ImagePostCard extends StatefulWidget {
   final Post post;
@@ -27,7 +28,6 @@ class _ImagePostCardState extends State<ImagePostCard> {
   void initState() {
     super.initState();
     _pageController = PageController();
-
     _isLiked = false;
     _likeCount = widget.post.likeCount;
   }
@@ -41,15 +41,24 @@ class _ImagePostCardState extends State<ImagePostCard> {
   @override
   Widget build(BuildContext context) {
     final post = widget.post;
+    final hasMultiple = post.mediaPaths.length > 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildHeader(post),
         _buildMedia(post),
-        _buildActions(),
-        _buildLikes(),
-        _buildCaption(post),
+        // 여기서 공통 Footer 사용
+        PostFooter(
+          post: post,
+          isLiked: _isLiked,
+          likeCount: _likeCount,
+          onToggleLike: _toggleLike,
+          onCommentTap: widget.onCommentTap,
+          showIndicator: hasMultiple,
+          currentPage: _currentPage,
+          totalPages: post.mediaPaths.length,
+        ),
         const SizedBox(height: 12),
       ],
     );
@@ -75,7 +84,6 @@ class _ImagePostCardState extends State<ImagePostCard> {
   }
 
   Widget _buildMedia(Post post) {
-    // 사진 1장일 때는 카운터 없어야 함
     if (post.mediaPaths.length == 1) {
       return AspectRatio(
         aspectRatio: 1,
@@ -103,7 +111,6 @@ class _ImagePostCardState extends State<ImagePostCard> {
               );
             },
           ),
-
           Positioned(
             right: 12,
             top: 12,
@@ -128,110 +135,10 @@ class _ImagePostCardState extends State<ImagePostCard> {
     );
   }
 
-  Widget _buildPageIndicator(int length) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(length, (index) {
-        final bool isActive = index == _currentPage;
-        return Container(
-          width: 6,
-          height: 6,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isActive ? Colors.blueGrey.shade900 : Colors.grey.shade400,
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildActions() {
-    final post = widget.post;
-    final hasMultiple = post.mediaPaths.length > 1;
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                _isLiked ? Icons.favorite : Icons.favorite_border,
-                color: _isLiked ? Colors.red : null,
-              ),
-              onPressed: _toggleLike,
-            ),
-            IconButton(
-              icon: const Icon(Icons.chat_bubble_outline),
-              onPressed: widget.onCommentTap ?? () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.repeat),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {},
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.bookmark_border),
-              onPressed: () {},
-            ),
-          ],
-        ),
-
-        // 여러 장일 때만 가운데 인디케이터
-        if (hasMultiple)
-          IgnorePointer(
-            ignoring: true,
-            child: _buildPageIndicator(post.mediaPaths.length),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildLikes() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Text(
-        '$_likeCount likes',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildCaption(Post post) {
-    final user = usersById[post.authorid];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(color: Colors.black),
-          children: [
-            TextSpan(
-              text: user?.userNickName ?? 'unknown',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const TextSpan(text: '  '),
-            TextSpan(text: post.caption),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _toggleLike() {
     setState(() {
-      if (_isLiked) {
-        _isLiked = false;
-        _likeCount -= 1;
-      } else {
-        _isLiked = true;
-        _likeCount += 1;
-      }
+      _isLiked = !_isLiked;
+      _likeCount += _isLiked ? 1 : -1;
     });
   }
 }
