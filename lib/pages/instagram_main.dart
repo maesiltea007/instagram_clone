@@ -12,26 +12,24 @@ class InstagramMain extends StatefulWidget {
 }
 
 class _InstagramMainState extends State<InstagramMain> {
-
   int _currentIndex = 0;
 
-  Widget _buildBottomTab(int index, IconData icon) =>
-      Expanded(
-        child: InkWell(
-          onTap: () {
-            setState(() => _currentIndex = index);
-          },
-          child: Container(
-            color: Colors.transparent,
-            child: Center(
-              child: Icon(
-                icon,
-                color: _currentIndex == index ? Colors.black : Colors.grey,
-              ),
-            ),
+  Widget _buildBottomTab(int index, IconData icon) => Expanded(
+    child: InkWell(
+      onTap: () {
+        setState(() => _currentIndex = index);
+      },
+      child: Container(
+        color: Colors.transparent,
+        child: Center(
+          child: Icon(
+            icon,
+            color: _currentIndex == index ? Colors.black : Colors.grey,
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   Widget _buildBody() {
     switch (_currentIndex) {
@@ -48,20 +46,26 @@ class _InstagramMainState extends State<InstagramMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
-        leading: IconButton(
-          icon: const Icon(Icons.camera_alt),
-          onPressed: () {},
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        titleSpacing: 16,
+        title: const Text(
+          'Instagram',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
         ),
-        elevation: 1,
-        backgroundColor: Theme.of(context).canvasColor,
-        title: Text(
-          widget.title,
-          style: const TextStyle(color: Colors.black),
-        ),
-        actions: <Widget>[
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            color: Colors.black,
+            onPressed: () {},
+          ),
           IconButton(
             icon: const Icon(Icons.send),
+            color: Colors.black,
             onPressed: () {},
           ),
         ],
@@ -94,7 +98,7 @@ class _InstagramMainState extends State<InstagramMain> {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }
