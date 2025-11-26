@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
 import 'package:instagram/data/dummy_posts.dart';
 import 'package:instagram/models/post.dart';
+import 'package:instagram/widgets/create_post/create_bottom_sheet.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
@@ -26,7 +27,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 12),
           _buildButtonsRow(),
           const SizedBox(height: 16),
-          _buildPostsSection(user), // ← 탭 + 그리드 + +버튼
+          _buildPostsSection(user, context), // ← context 넘김
           const SizedBox(height: 20),
         ],
       ),
@@ -65,11 +66,15 @@ class ProfilePage extends StatelessWidget {
                     ),
                     Expanded(
                       child: _StatItem(
-                          label: 'followers', count: user.followerCount),
+                        label: 'followers',
+                        count: user.followerCount,
+                      ),
                     ),
                     Expanded(
                       child: _StatItem(
-                          label: 'following', count: user.followingCount),
+                        label: 'following',
+                        count: user.followingCount,
+                      ),
                     ),
                   ],
                 ),
@@ -167,19 +172,19 @@ class ProfilePage extends StatelessWidget {
   }
 
   // ───────── 상단 탭 + 그리드 전체 섹션 ─────────
-  Widget _buildPostsSection(User user) {
+  Widget _buildPostsSection(User user, BuildContext context) {
     final List<Post> userPosts =
     dummyPosts.where((p) => p.authorid == user.id).toList();
 
     return Column(
       children: [
         _buildPostTabs(),
-        _buildPostGrid(userPosts),
+        _buildPostGrid(userPosts, context),
       ],
     );
   }
 
-  // 상단 그리드 / 사람 아이콘 탭 (기능 없음, 디자인만)
+  // 상단 그리드 / 태그 탭
   Widget _buildPostTabs() {
     return Column(
       children: [
@@ -192,7 +197,7 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 6),
                   Container(
                     height: 1.5,
-                    color: Colors.black, // 활성 탭 밑줄
+                    color: Colors.black,
                   ),
                 ],
               ),
@@ -221,29 +226,14 @@ class ProfilePage extends StatelessWidget {
   }
 
   // ───────── 내 게시물 그리드 + 마지막 "+" 타일 ─────────
-  Widget _buildPostGrid(List<Post> userPosts) {
-    if (userPosts.isEmpty) {
-      // 그래도 + 타일은 보여주고 싶으면 여기서 바로 그리드 그려도 됨.
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 1),
-        itemCount: 1,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 1,
-          crossAxisSpacing: 1,
-          childAspectRatio: 1,
-        ),
-        itemBuilder: (context, index) => _buildAddPostTile(),
-      );
-    }
+  Widget _buildPostGrid(List<Post> userPosts, BuildContext context) {
+    final itemCount = userPosts.isEmpty ? 1 : userPosts.length + 1;
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.only(top: 1),
-      itemCount: userPosts.length + 1, // +1: 마지막은 추가 버튼
+      itemCount: itemCount,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 1,
@@ -251,8 +241,14 @@ class ProfilePage extends StatelessWidget {
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
+        // 마지막 칸 → + 타일
         if (index == userPosts.length) {
-          return _buildAddPostTile();
+          return _buildAddPostTile(context);
+        }
+
+        if (userPosts.isEmpty) {
+          // 실제 포스트 없고 + 하나만 보여줄 때
+          return _buildAddPostTile(context);
         }
 
         final post = userPosts[index];
@@ -278,16 +274,28 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAddPostTile() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.add,
-          size: 32,
-          color: Colors.grey.shade700,
+  Widget _buildAddPostTile(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (_) => const CreateBottomSheet(),
+        );
+      },
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFFF5F5F5),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.add,
+            size: 32,
+            color: Colors.grey.shade700,
+          ),
         ),
       ),
     );
