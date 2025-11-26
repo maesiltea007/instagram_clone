@@ -85,4 +85,28 @@ final List<Post> dummyPosts = [
     likeCount: 77777,
     createdAt: DateTime(2025, 10, 20),
   ),
+
+  //내  포스트 - 코딩화면
+  Post(
+    id: '7',
+    authorid: '0',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/ta_junhyuk_coding_screen.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+  ),
+
+  //내 포스트 - 태블릿 박스
+  Post(
+    id: '8',
+    authorid: '0',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/ta_junhyuk_lenovobox.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+  ),
 ];
