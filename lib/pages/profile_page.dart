@@ -35,7 +35,7 @@ class ProfilePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 프로필 이미지
           CircleAvatar(
@@ -44,19 +44,36 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(width: 20),
 
-          // 통계 영역
+          // 이름 + 통계 영역
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: _StatItem(label: 'posts', count: postCount),
+                // ← 여기서 이름
+                Text(
+                  user.userName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                Expanded(
-                  child: _StatItem(label: 'followers', count: user.followerCount),
-                ),
-                Expanded(
-                  child: _StatItem(label: 'following', count: user.followingCount),
+                const SizedBox(height: 8),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: _StatItem(label: 'posts', count: postCount),
+                    ),
+                    Expanded(
+                      child: _StatItem(
+                          label: 'followers', count: user.followerCount),
+                    ),
+                    Expanded(
+                      child: _StatItem(
+                          label: 'following', count: user.followingCount),
+                    ),
+                  ],
                 ),
               ],
             ),
