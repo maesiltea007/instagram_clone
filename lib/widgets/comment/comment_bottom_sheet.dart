@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/post.dart';
+import 'package:instagram/models/comment.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/data/dummy_comments.dart';
 
@@ -26,7 +27,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final comments = commentsByPostId[widget.post.id] ?? [];
+    final List<Comment> comments =
+        commentsByPostId[widget.post.id] ?? <Comment>[];
 
     return SafeArea(
       top: false,
@@ -122,7 +124,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     );
   }
 
-  Widget _buildCommentsList(List comments) {
+  Widget _buildCommentsList(List<Comment> comments) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: comments.length,
@@ -266,10 +268,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           ),
           IconButton(
             icon: const Icon(Icons.send),
-            onPressed: () {
-              _controller.clear();
-            },
             splashRadius: 20,
+            onPressed: () {
+              final text = _controller.text.trim();
+              if (text.isEmpty) return;
+
+              final newComment = Comment(
+                id: 'local_${DateTime.now().millisecondsSinceEpoch}',
+                postid: widget.post.id,
+                authorId: currentUser.id,
+                text: text,
+                createdAt: DateTime.now(),
+              );
+
+              setState(() {
+                final list = commentsByPostId[widget.post.id] ?? <Comment>[];
+                commentsByPostId[widget.post.id] = [...list, newComment];
+                _controller.clear();
+              });
+            },
           ),
         ],
       ),
