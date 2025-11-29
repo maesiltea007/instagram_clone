@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/create_post/post_caption_bottom_sheet2.dart';
 import '../widgets/create_post/post_caption_bottom_sheet_1.dart';
 
 class PostCaptionPage extends StatefulWidget {
@@ -200,7 +201,19 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                     ),
                   ),
                   onPressed: () {
-                    // TODO: 실제 포스트 업로드
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: false,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (_) => PostCaptionBottomSheet2(
+                        onOk: () {
+                          // 여기서 실제 업로드 로직 실행하면 됨
+                        },
+                      ),
+                    );
                   },
                   child: const Text(
                     'Share',

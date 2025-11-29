@@ -110,3 +110,15 @@ final List<Post> dummyPosts = [
     createdAt: DateTime(2025, 10, 20),
   ),
 ];
+
+
+
+void upsertUserPost(Post post) {
+  final idx = dummyPosts.indexWhere((p) => p.id == post.id);
+  if (idx == -1) {
+    // 새 게시물은 피드 맨 위로
+    dummyPosts.insert(0, post);
+  } else {
+    dummyPosts[idx] = post;
+  }
+}
