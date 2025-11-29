@@ -3,6 +3,7 @@ import 'package:instagram/pages/feed_page.dart';
 import 'package:instagram/pages/profile_page.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/widgets/create_post/after_post_bottom_sheet.dart';
+import 'package:instagram/pages/notifications_page.dart';
 
 class InstagramMain extends StatefulWidget {
   final String title;
@@ -101,7 +102,15 @@ class _InstagramMainState extends State<InstagramMain> {
             IconButton(
               icon: const Icon(Icons.favorite_border),
               color: Colors.black,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => const NotificationsPage(),
+                    transitionDuration: Duration.zero,        // 들어갈 때 애니메이션 없음
+                    reverseTransitionDuration: Duration.zero, // 뒤로 갈 때도 없음
+                  ),
+                );
+              },
             ),
             IconButton(
               icon: const Icon(Icons.send),
