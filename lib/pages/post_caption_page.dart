@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/dummy_comments.dart';
 import '../data/dummy_posts.dart';
 import '../models/post.dart';
 import '../widgets/create_post/post_caption_bottom_sheet_2.dart';
@@ -43,6 +44,8 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     );
 
     upsertUserPost(newPost);
+
+    scheduleAutoCommentForPost(newPost.id); //더미 댓글달기
 
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(

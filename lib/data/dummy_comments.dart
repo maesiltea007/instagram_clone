@@ -1,4 +1,5 @@
 import '../models/comment.dart';
+import 'dart:async';
 
 final Map<String, List<Comment>> commentsByPostId = {
 
@@ -35,3 +36,25 @@ final Map<String, List<Comment>> commentsByPostId = {
   ],
 
 };
+
+
+// 10초 뒤 자동 댓글 추가
+void scheduleAutoCommentForPost(String postId) {
+  Future.delayed(const Duration(seconds: 10), () {
+    final current = commentsByPostId[postId] ?? <Comment>[];
+    final alreadyExists =
+    current.any((c) => c.authorId == '10');
+
+    if (alreadyExists) return;
+
+    final newComment = Comment(
+      id: 'auto_${DateTime.now().millisecondsSinceEpoch}',
+      postid: postId,
+      authorId: '10',
+      text: 'so cute!!',
+      createdAt: DateTime.now(),
+    );
+
+    commentsByPostId[postId] = [...current, newComment];
+  });
+}

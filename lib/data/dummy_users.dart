@@ -15,6 +15,7 @@ final Map<String, User> usersById = {
   '7': user7, //춤추는 영상에 댓글 다는 계정
   '8': user8, //카리나에 댓글 다는 계정
   '9': user9, //윈터에 댓글 다는 계정
+  '10': user10, //내 게시물에 댓글 다는 계정
 };
 
 //유저 더미 데이터
@@ -132,6 +133,18 @@ const User user9 = User(
   id: '9',
   userNickName: 'winter_fan',
   userName: 'comment',
+  profileImagePath:
+  'assets/images/profile_images/default_user_image.jpg',
+  bio: '',
+  followerCount: 1,
+  followingCount: 1,
+);
+
+//내 게시물에 댓글 다는 계정
+const User user10 = User(
+  id: '10',
+  userNickName: 'haetbaaaan',
+  userName: 'rice',
   profileImagePath:
   'assets/images/profile_images/default_user_image.jpg',
   bio: '',
