@@ -125,6 +125,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   Widget _buildCommentsList(List<Comment> comments) {
+    final postAuthor = usersById[widget.post.authorid];
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: comments.length,
@@ -132,7 +134,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         final c = comments[index];
         final user = usersById[c.authorId];
 
-        final bool isAuthor = c.authorId == widget.post.authorid;
+        // 이 댓글이 게시물 작성자의 댓글인가?
+        final bool isAuthorComment = c.authorId == widget.post.authorid;
+
+        // "게시물 작성자가 이 댓글에 좋아요 눌렀는가?"
+        // like == true 이고, 댓글 작성자는 게시물 작성자가 아님
+        final bool likedByPostAuthor = c.like && !isAuthorComment;
+
         final String timeText = _timeAgoShort(c.createdAt);
 
         return Padding(
@@ -150,7 +158,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1줄: 아이디 + 시간 + (Author)
+                    // 1줄: 아이디 + 시간 + (Author / 작성자 좋아요 배지)
                     Row(
                       children: [
                         Text(
@@ -168,7 +176,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                             color: Colors.grey,
                           ),
                         ),
-                        if (isAuthor) ...[
+
+                        // 이 댓글이 게시물 작성자의 댓글이면 "• Author"
+                        if (isAuthorComment) ...[
                           const SizedBox(width: 4),
                           const Text(
                             '• Author',
@@ -176,6 +186,22 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                               fontSize: 11,
                               color: Colors.grey,
                             ),
+                          ),
+                        ],
+
+                        // 작성자가 다른 사람의 댓글에 좋아요 눌렀을 때
+                        if (likedByPostAuthor && postAuthor != null) ...[
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.favorite,
+                            size: 12,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(width: 4),
+                          CircleAvatar(
+                            radius: 8,
+                            backgroundImage:
+                            AssetImage(postAuthor.profileImagePath),
                           ),
                         ],
                       ],
@@ -194,40 +220,75 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
                     const SizedBox(height: 4),
 
-                    // 3줄: Reply / Reply with a reel
-                    Row(
-                      children: const [
-                        Text(
-                          'Reply',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
+                    // 3줄: Reply 영역
+                    if (c.authorId == currentUser.id) ...[
+                      // 내가 쓴 댓글
+                      Row(
+                        children: const [
+                          Text(
+                            'Reply',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Reply with a reel',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
+                          SizedBox(width: 12),
+                          Text(
+                            'See translation',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ] else ...[
+                      // 남이 쓴 댓글에 대해
+                      Row(
+                        children: const [
+                          Text(
+                            'Reply',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Reply with a reel',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Hide',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // 인스타처럼 "Reply to haetbaaaan…" 표시
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundImage: AssetImage(currentUser.profileImagePath),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Reply to ${user?.userNickName ?? ''}…',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          )
+                        ],
+                      )
+                    ],
                   ],
                 ),
               ),
 
               const SizedBox(width: 8),
 
-              // 오른쪽 좋아요 토글 (실제 Comment.like 사용)
+              // 오른쪽 좋아요 토글
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    c.like = !c.like; // 실제 모델 필드 변경
+                    c.like = !c.like;
                   });
                 },
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       c.like ? Icons.favorite : Icons.favorite_border,
@@ -237,7 +298,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     const SizedBox(height: 2),
                     if (c.like)
                       const Text(
-                        '1', // 나만 누른 거니까 항상 1
+                        '1',
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.grey,
