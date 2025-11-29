@@ -132,7 +132,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         final c = comments[index];
         final user = usersById[c.authorId];
 
-        // 진짜 글쓴이인지 확인
         final bool isAuthor = c.authorId == widget.post.authorid;
         final String timeText = _timeAgoShort(c.createdAt);
 
@@ -195,13 +194,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
                     const SizedBox(height: 4),
 
-                    // 3줄: Reply
-                    const Text(
-                      'Reply',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
+                    // 3줄: Reply / Reply with a reel
+                    Row(
+                      children: const [
+                        Text(
+                          'Reply',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Reply with a reel',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -209,10 +220,31 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
               const SizedBox(width: 8),
 
-              Icon(
-                Icons.favorite_border,
-                size: 18,
-                color: Colors.grey.shade600,
+              // 오른쪽 좋아요 토글 (실제 Comment.like 사용)
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    c.like = !c.like; // 실제 모델 필드 변경
+                  });
+                },
+                child: Column(
+                  children: [
+                    Icon(
+                      c.like ? Icons.favorite : Icons.favorite_border,
+                      size: 18,
+                      color: c.like ? Colors.red : Colors.grey.shade600,
+                    ),
+                    const SizedBox(height: 2),
+                    if (c.like)
+                      const Text(
+                        '1', // 나만 누른 거니까 항상 1
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),

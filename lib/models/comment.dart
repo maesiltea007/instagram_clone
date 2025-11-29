@@ -4,7 +4,7 @@ class Comment {
   final String authorId;
   final String text;
   final DateTime createdAt;
-  int likeCount;
+  bool like;
 
   Comment({
     required this.id,
@@ -12,6 +12,6 @@ class Comment {
     required this.authorId,
     required this.text,
     required this.createdAt,
-    this.likeCount = 0,
+    this.like = false,
   });
 }
