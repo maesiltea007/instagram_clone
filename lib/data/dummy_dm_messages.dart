@@ -1,7 +1,8 @@
 import 'package:instagram/models/dm_message.dart';
 
+// 전체 메시지 flat 리스트
 final List<DmMessage> dummyDmMessages = [
-  // Thread t1
+  // t1
   DmMessage(
     messageId: 'm1',
     threadId: 't1',
@@ -17,7 +18,7 @@ final List<DmMessage> dummyDmMessages = [
     isMine: true,
   ),
 
-  // Thread t2
+  // t2
   DmMessage(
     messageId: 'm3',
     threadId: 't2',
@@ -33,3 +34,13 @@ final List<DmMessage> dummyDmMessages = [
     isMine: true,
   ),
 ];
+
+// threadId → List<DmMessage> 변환
+final Map<String, List<DmMessage>> dmMessagesByThreadId = (() {
+  final map = <String, List<DmMessage>>{};
+  for (final msg in dummyDmMessages) {
+    map.putIfAbsent(msg.threadId, () => []);
+    map[msg.threadId]!.add(msg);
+  }
+  return map;
+})();
