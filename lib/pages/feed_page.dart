@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/widgets/post_cards/post_card.dart';
 import 'package:instagram/data/dummy_posts.dart';
+import '../widgets/comment/comment_bottom_sheet.dart';
 
 class FeedPage extends StatelessWidget {
   const FeedPage({super.key});
@@ -14,7 +15,12 @@ class FeedPage extends StatelessWidget {
         return PostCard(
           post: post,
           onCommentTap: () {
-            // 나중에 댓글 페이지로 이동 같은 거 넣을 자리
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => CommentsBottomSheet(post: post),
+            );
           },
         );
       },
