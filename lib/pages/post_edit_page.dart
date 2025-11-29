@@ -1,7 +1,6 @@
-// lib/pages/post_edit_page.dart
 import 'package:flutter/material.dart';
-import 'package:instagram/models/music.dart';
 import 'package:instagram/data/dummy_musics.dart';
+import 'package:instagram/pages/post_caption_page.dart';
 
 class PostEditPage extends StatelessWidget {
   final String imagePath;
@@ -216,15 +215,21 @@ class PostEditPage extends StatelessWidget {
           // Next 버튼
           TextButton(
             style: TextButton.styleFrom(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
               backgroundColor: Colors.blue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
             onPressed: () {
-              // TODO: 캡션 작성 페이지로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PostCaptionPage(
+                    imagePath: imagePath,   // PostEditPage가 가지고 있는 이미지 경로를 전달
+                  ),
+                ),
+              );
             },
             child: const Row(
               children: [
@@ -240,7 +245,7 @@ class PostEditPage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
