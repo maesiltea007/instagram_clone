@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/pages/feed_page.dart';
 import 'package:instagram/pages/profile_page.dart';
-import 'package:instagram/data/dummy_users.dart'; // currentUser
+import 'package:instagram/data/dummy_users.dart';
+import 'package:instagram/widgets/create_post/after_post_bottom_sheet.dart';
 
 class InstagramMain extends StatefulWidget {
+  final String title;
+  final int initialIndex;   // ← 추가
+
   const InstagramMain({
     super.key,
     required this.title,
-    this.initialIndex = 0,          // ← 시작 탭 인덱스 (기본 0: 피드)
+    this.initialIndex = 0,  // 기본은 피드
   });
-
-  final String title;
-  final int initialIndex;
 
   @override
   State<InstagramMain> createState() => _InstagramMainState();
@@ -19,11 +20,35 @@ class InstagramMain extends StatefulWidget {
 
 class _InstagramMainState extends State<InstagramMain> {
   late int _currentIndex;
+  bool _shouldShowAfterPostSheet = false;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;   // ← 외부에서 넘긴 값으로 시작
+    _currentIndex = widget.initialIndex;
+
+    // 프로필 탭으로 들어온 경우에만 after_post_bottom_sheet 자동 표시
+    if (_currentIndex == 4) {
+      _shouldShowAfterPostSheet = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAfterPostSheet();
+      });
+    }
+  }
+
+  void _showAfterPostSheet() {
+    if (!_shouldShowAfterPostSheet) return;
+    _shouldShowAfterPostSheet = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const AfterPostBottomSheet(),
+    );
   }
 
   // ░░ Bottom Tab 공통 위젯 ░░
@@ -59,7 +84,6 @@ class _InstagramMainState extends State<InstagramMain> {
   // ░░ 탭별 AppBar 스위치 ░░
   PreferredSizeWidget _buildAppBar() {
     switch (_currentIndex) {
-    // 피드 탭
       case 0:
         return AppBar(
           automaticallyImplyLeading: false,
@@ -87,7 +111,6 @@ class _InstagramMainState extends State<InstagramMain> {
           ],
         );
 
-    // 프로필 탭
       case 4:
         return AppBar(
           automaticallyImplyLeading: false,
@@ -126,7 +149,6 @@ class _InstagramMainState extends State<InstagramMain> {
           ],
         );
 
-    // 나머지 탭 (임시 공통 AppBar)
       default:
         return AppBar(
           automaticallyImplyLeading: false,
@@ -156,7 +178,6 @@ class _InstagramMainState extends State<InstagramMain> {
             _buildBottomTab(1, Icons.search),
             _buildBottomTab(2, Icons.add_box_outlined),
             _buildBottomTab(3, Icons.smart_display_outlined),
-            // 프로필 탭 (동그란 이미지)
             Expanded(
               child: InkWell(
                 onTap: () {

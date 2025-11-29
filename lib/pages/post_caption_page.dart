@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/dummy_posts.dart';
 import '../models/post.dart';
-import '../widgets/create_post/post_caption_bottom_sheet2.dart';
+import '../widgets/create_post/post_caption_bottom_sheet_2.dart';
 import '../widgets/create_post/post_caption_bottom_sheet_1.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/pages/instagram_main.dart';
