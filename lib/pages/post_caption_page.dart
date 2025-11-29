@@ -8,7 +8,6 @@ import 'package:instagram/pages/instagram_main.dart';
 
 class PostCaptionPage extends StatefulWidget {
   final String imagePath;
-
   const PostCaptionPage({
     super.key,
     required this.imagePath,
@@ -45,13 +44,14 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
 
     upsertUserPost(newPost);
 
-    // 전체 스택 비우고 InstagramMain(프로필 탭) 하나만 남기기
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => InstagramMain(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => InstagramMain(
           title: 'Instagram',
-          initialIndex: 4,   // 프로필 탭
+          initialIndex: 4, // 프로필 탭
         ),
+        transitionDuration: Duration.zero,        // ← 슬라이드 제거
+        reverseTransitionDuration: Duration.zero, // ← 뒤로 갈 때도 제거
       ),
           (route) => false,
     );
