@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import '../data/dummy_posts.dart';
+import '../models/post.dart';
 import '../widgets/create_post/post_caption_bottom_sheet2.dart';
 import '../widgets/create_post/post_caption_bottom_sheet_1.dart';
+import 'package:instagram/data/dummy_users.dart';
+import 'package:instagram/pages/instagram_main.dart';
 
 class PostCaptionPage extends StatefulWidget {
   final String imagePath;
@@ -24,6 +28,33 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showCaptionBottomSheet();
     });
+  }
+
+  void _uploadPost() {
+    final caption = _captionController.text.trim();
+
+    final newPost = Post(
+      id: '0',
+      authorid: currentUser.id,
+      caption: caption,
+      mediaPaths: [widget.imagePath],
+      isVideo: false,
+      likeCount: 0,
+      createdAt: DateTime.now(),
+    );
+
+    upsertUserPost(newPost);
+
+    // 전체 스택 비우고 InstagramMain(프로필 탭) 하나만 남기기
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => InstagramMain(
+          title: 'Instagram',
+          initialIndex: 4,   // 프로필 탭
+        ),
+      ),
+          (route) => false,
+    );
   }
 
   @override
@@ -208,9 +239,10 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                       ),
-                      builder: (_) => PostCaptionBottomSheet2(
+                      builder: (sheetCtx) => PostCaptionBottomSheet2(
                         onOk: () {
-                          // 여기서 실제 업로드 로직 실행하면 됨
+                          Navigator.of(sheetCtx).pop(); // bottom sheet 닫기
+                          _uploadPost();                // 업로드 + 화면 전환
                         },
                       ),
                     );

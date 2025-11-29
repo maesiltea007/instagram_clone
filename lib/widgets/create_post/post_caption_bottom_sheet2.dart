@@ -1,4 +1,3 @@
-// lib/widgets/create_post/post_caption_bottom_sheet_2.dart
 import 'package:flutter/material.dart';
 
 class PostCaptionBottomSheet2 extends StatelessWidget {
@@ -78,10 +77,7 @@ class PostCaptionBottomSheet2 extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-                onPressed: () {
-                  onOk();
-                  Navigator.pop(context);
-                },
+                onPressed: onOk,
                 child: const Text(
                   'OK',
                   style: TextStyle(

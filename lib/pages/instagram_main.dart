@@ -4,15 +4,27 @@ import 'package:instagram/pages/profile_page.dart';
 import 'package:instagram/data/dummy_users.dart'; // currentUser
 
 class InstagramMain extends StatefulWidget {
-  const InstagramMain({super.key, required this.title});
+  const InstagramMain({
+    super.key,
+    required this.title,
+    this.initialIndex = 0,          // ← 시작 탭 인덱스 (기본 0: 피드)
+  });
+
   final String title;
+  final int initialIndex;
 
   @override
   State<InstagramMain> createState() => _InstagramMainState();
 }
 
 class _InstagramMainState extends State<InstagramMain> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;   // ← 외부에서 넘긴 값으로 시작
+  }
 
   // ░░ Bottom Tab 공통 위젯 ░░
   Widget _buildBottomTab(int index, IconData icon) => Expanded(
