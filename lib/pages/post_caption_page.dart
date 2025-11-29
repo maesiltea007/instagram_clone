@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/create_post/post_caption_bottom_sheet_1.dart';
 
 class PostCaptionPage extends StatefulWidget {
   final String imagePath;
@@ -16,9 +17,30 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
   final TextEditingController _captionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // 화면 들어오자마자 한 번만 바텀시트 표시
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showCaptionBottomSheet();
+    });
+  }
+
+  @override
   void dispose() {
     _captionController.dispose();
     super.dispose();
+  }
+
+  void _showCaptionBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const PostCaptionBottomSheet1(),
+    );
   }
 
   @override
