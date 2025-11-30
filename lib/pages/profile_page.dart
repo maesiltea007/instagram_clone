@@ -3,6 +3,7 @@ import 'package:instagram/models/user.dart';
 import 'package:instagram/data/dummy_posts.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/widgets/create_post/create_bottom_sheet.dart';
+import 'package:instagram/pages/edit_profile_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
@@ -25,9 +26,9 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 8),
           _buildUserInfo(user),
           const SizedBox(height: 12),
-          _buildButtonsRow(),
+          _buildButtonsRow(context, user),      // ← user 넘김
           const SizedBox(height: 16),
-          _buildPostsSection(user, context), // ← context 넘김
+          _buildPostsSection(user, context),
           const SizedBox(height: 20),
         ],
       ),
@@ -104,7 +105,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   // ───────────────── 버튼 줄 ─────────────────
-  Widget _buildButtonsRow() {
+  Widget _buildButtonsRow(BuildContext context, User user) {
     final Color bg = const Color(0xFFEFEFEF);
     final Color border = const Color(0xFFDBDBDB);
 
@@ -121,7 +122,15 @@ class ProfilePage extends StatelessWidget {
                 border: Border.all(color: border),
               ),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => EditProfilePage(user: user),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                },
                 child: const Text(
                   'Edit profile',
                   style: TextStyle(color: Colors.black, fontSize: 14),
@@ -184,7 +193,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // 상단 그리드 / 태그 탭
   Widget _buildPostTabs() {
     return Column(
       children: [
@@ -225,7 +233,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // ───────── 내 게시물 그리드 + 마지막 "+" 타일 ─────────
   Widget _buildPostGrid(List<Post> userPosts, BuildContext context) {
     final itemCount = userPosts.isEmpty ? 1 : userPosts.length + 1;
 
@@ -241,13 +248,11 @@ class ProfilePage extends StatelessWidget {
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
-        // 마지막 칸 → + 타일
         if (index == userPosts.length) {
           return _buildAddPostTile(context);
         }
 
         if (userPosts.isEmpty) {
-          // 실제 포스트 없고 + 하나만 보여줄 때
           return _buildAddPostTile(context);
         }
 
