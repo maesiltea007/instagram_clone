@@ -48,7 +48,7 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     );
 
     upsertUserPost(newPost);
-    scheduleAutoCommentForPost(newPost.id);
+    scheduleAutoCommentForPost(newPost.id); //으아ㅏㅏㅏㅏ
 
     // ★ 여기가 핵심 수정
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(

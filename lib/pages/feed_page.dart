@@ -1,18 +1,23 @@
+// lib/pages/feed_page.dart
 import 'package:flutter/material.dart';
 import 'package:instagram/widgets/post_cards/post_card.dart';
 import 'package:instagram/data/dummy_posts.dart';
 import 'package:instagram/pages/notifications_page.dart';
 import 'package:instagram/pages/dm_list_page.dart';
 import 'package:instagram/widgets/comment/comment_bottom_sheet.dart';
+import 'package:instagram/data/dummy_users.dart';
+import 'package:instagram/data/dummy_notifications.dart';
 
-import '../data/dummy_users.dart';
-
-class FeedPage extends StatelessWidget {
+class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
 
   @override
+  State<FeedPage> createState() => _FeedPageState();
+}
+
+class _FeedPageState extends State<FeedPage> {
+  @override
   Widget build(BuildContext context) {
-    // 피드에 보여줄 포스트만 필터링
     final feedPosts = dummyPosts.where((post) => post.showFeed).toList();
 
     return Scaffold(
@@ -27,21 +32,52 @@ class FeedPage extends StatelessWidget {
           style: TextStyle(
             color: Colors.black,
             fontSize: 26,
-            fontFamily: 'InstagramLogo', // 너 쓰는 폰트 있으면 유지 / 없으면 삭제
+            fontFamily: 'InstagramLogo',
           ),
         ),
         actions: [
+          // ★ 알림 아이콘 + 뱃지
           IconButton(
-            icon: const Icon(Icons.favorite_border),
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.favorite_border),
+                if (unreadNotificationCount > 0)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        unreadNotificationCount.toString(),
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             color: Colors.black,
             onPressed: () {
-              Navigator.of(context).push(
+              Navigator.of(context)
+                  .push(
                 PageRouteBuilder(
                   pageBuilder: (_, __, ___) => const NotificationsPage(),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                 ),
-              );
+              )
+                  .then((_) {
+                // 알림 페이지에서 읽음 처리 후 돌아오면 배지 상태 갱신
+                setState(() {});
+              });
             },
           ),
           IconButton(
@@ -64,36 +100,32 @@ class FeedPage extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 8),
-
-          // ---------------- Story Bar ------------------
+          // 스토리 바
           SizedBox(
             height: 102,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
-                _buildStoryItem("Your story",
-                    currentUser.profileImagePath, true),
-
+                _buildStoryItem(
+                    "Your story", currentUser.profileImagePath, true),
                 _buildStoryItem("imwinter",
                     "assets/images/profile_images/winter_profile.jpg", false),
-
                 _buildStoryItem("katarinabluu",
                     "assets/images/profile_images/karina_profile.jpg", false),
-
                 _buildStoryItem("aespa_official",
                     "assets/images/profile_images/aespa_logo.jpg", false),
-
-                _buildStoryItem("sarang", "assets/images/profile_images/default_user_image.jpg", false),
-
-                _buildStoryItem("joyuri", "assets/images/profile_images/default_user_image.jpg", false),
+                _buildStoryItem("sarang",
+                    "assets/images/profile_images/default_user_image.jpg",
+                    false),
+                _buildStoryItem("joyuri",
+                    "assets/images/profile_images/default_user_image.jpg",
+                    false),
               ],
             ),
           ),
-
           const Divider(height: 1),
-
-          // -------------- Posts ------------------
+          // 포스트들
           for (final post in feedPosts)
             PostCard(
               post: post,
@@ -111,7 +143,6 @@ class FeedPage extends StatelessWidget {
     );
   }
 
-  // ---------------- Story Item Builder -----------------
   Widget _buildStoryItem(String label, String imgPath, bool isMine) {
     return Padding(
       padding: const EdgeInsets.only(right: 14),
@@ -120,7 +151,6 @@ class FeedPage extends StatelessWidget {
           Stack(
             alignment: Alignment.center,
             children: [
-              // 스토리 테두리 (남의 스토리일 때만 보라색 링)
               if (!isMine)
                 Container(
                   width: 70,
@@ -135,12 +165,10 @@ class FeedPage extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              // 내 스토리는 테두리 없음
               Container(
                 width: 64,
                 height: 64,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
