@@ -33,8 +33,8 @@ final Map<String, User> usersById = {
 
 //팔로잉 매핑
 final Map<String, List<String>> followingByUserId = {
-  '0': ['13', '14', '15', '16', '17', '1', '2', '12', '50'],
-  '6': ['1', '2', '12', '50'],
+  '0': ['13', '14', '15', '16', '17', '6', '2' , '50'],
+  '6': ['1', '12', '2', '50'],
 };
 
 // 헬퍼 함수
@@ -58,7 +58,7 @@ User user0 = User(
   'assets/images/profile_images/puang_profile_image.jpg',
   bio: 'I will be the god of flutter',
   followerCount: 10,
-  followingCount: 9,
+  followingCount: 8,
 );
 
 //에스파

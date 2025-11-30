@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
 import 'package:instagram/data/dummy_users.dart'; // usersById, getFollowingUsers
+import 'package:instagram/pages/others_profile_page.dart'; // ★ 추가
 
 class FollowingPage extends StatelessWidget {
   final User owner; // 어느 계정의 팔로잉 목록인지
@@ -168,7 +169,21 @@ class FollowingPage extends StatelessWidget {
               itemCount: following.length,
               itemBuilder: (context, index) {
                 final u = following[index];
-                return _FollowingListItem(user: u);
+
+                return InkWell(
+                  onTap: () {
+                    // 다른 유저 프로필로 이동 (애니메이션 없음)
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) =>
+                            OthersProfilePage(target: u),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                    );
+                  },
+                  child: _FollowingListItem(user: u),
+                );
               },
             ),
           ),
