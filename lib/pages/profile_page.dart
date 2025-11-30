@@ -5,7 +5,7 @@ import 'package:instagram/models/post.dart';
 import 'package:instagram/widgets/create_post/create_bottom_sheet.dart';
 import 'package:instagram/pages/edit_profile_page.dart';
 import 'package:instagram/widgets/post_cards/post_pop_up.dart';
-import 'package:instagram/pages/following_page.dart'; // ★ 추가
+import 'package:instagram/pages/following_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final User user;
@@ -24,12 +24,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showPostPopup(BuildContext context, Post post) {
-    _hidePostPopup(); // 혹시 남아 있던 거 제거
-
+    _hidePostPopup();
     _postOverlay = OverlayEntry(
       builder: (_) => PostPopUp(post: post),
     );
-
     Overlay.of(context, rootOverlay: true).insert(_postOverlay!);
   }
 
@@ -49,19 +47,58 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = widget.user;
     final postCount = _getPostCountForUser(user);
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context, user, postCount), // ★ context 넘김
-          const SizedBox(height: 8),
-          _buildUserInfo(user),
-          const SizedBox(height: 12),
-          _buildButtonsRow(context, user),
-          const SizedBox(height: 16),
-          _buildPostsSection(user, context),
-          const SizedBox(height: 20),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            Text(
+              user.userNickName,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              size: 20,
+              color: Colors.black,
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_box_outlined),
+            color: Colors.black,
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu),
+            color: Colors.black,
+            onPressed: () {},
+          ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context, user, postCount),
+            const SizedBox(height: 8),
+            _buildUserInfo(user),
+            const SizedBox(height: 12),
+            _buildButtonsRow(context, user),
+            const SizedBox(height: 16),
+            _buildPostsSection(user, context),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -102,7 +139,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         count: user.followerCount,
                       ),
                     ),
-                    // ★ following 부분만 탭 가능
                     Expanded(
                       child: InkWell(
                         onTap: () {
@@ -167,6 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: TextButton(
                 onPressed: () {
+                  // 이 페이지 위에 전체 화면으로 띄워야 하니까 그냥 push
                   Navigator.of(context).push(
                     PageRouteBuilder(
                       pageBuilder: (_, __, ___) =>
@@ -293,18 +330,12 @@ class _ProfilePageState extends State<ProfilePage> {
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
-        // 마지막 칸: + 타일
-        if (index == userPosts.length) {
-          return _buildAddPostTile(context);
-        }
-
-        if (userPosts.isEmpty) {
+        if (index == userPosts.length || userPosts.isEmpty) {
           return _buildAddPostTile(context);
         }
 
         final post = userPosts[index];
 
-        // 사진 게시물만 있다고 했으니 바로 이미지
         return GestureDetector(
           onLongPressStart: (_) => _showPostPopup(context, post),
           onLongPressEnd: (_) => _hidePostPopup(),

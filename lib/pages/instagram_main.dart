@@ -3,18 +3,15 @@ import 'package:instagram/pages/feed_page.dart';
 import 'package:instagram/pages/profile_page.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/widgets/create_post/after_post_bottom_sheet.dart';
-import 'package:instagram/pages/notifications_page.dart';
-
-import 'dm_list_page.dart';
 
 class InstagramMain extends StatefulWidget {
   final String title;
-  final int initialIndex;   // ← 추가
+  final int initialIndex; // 0: 피드, 4: 프로필
 
   const InstagramMain({
     super.key,
     required this.title,
-    this.initialIndex = 0,  // 기본은 피드
+    this.initialIndex = 0,
   });
 
   @override
@@ -25,12 +22,15 @@ class _InstagramMainState extends State<InstagramMain> {
   late int _currentIndex;
   bool _shouldShowAfterPostSheet = false;
 
+  // 프로필 탭 전용 Navigator
+  final GlobalKey<NavigatorState> _profileNavigatorKey =
+  GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
 
-    // 프로필 탭으로 들어온 경우에만 after_post_bottom_sheet 자동 표시
     if (_currentIndex == 4) {
       _shouldShowAfterPostSheet = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,7 +58,9 @@ class _InstagramMainState extends State<InstagramMain> {
   Widget _buildBottomTab(int index, IconData icon) => Expanded(
     child: InkWell(
       onTap: () {
-        setState(() => _currentIndex = index);
+        setState(() {
+          _currentIndex = index;
+        });
       },
       child: Container(
         color: Colors.transparent,
@@ -72,123 +74,34 @@ class _InstagramMainState extends State<InstagramMain> {
     ),
   );
 
-  // ░░ 바디 스위치 ░░
+  // ░░ 탭별 화면 스위치 ░░
   Widget _buildBody() {
-    switch (_currentIndex) {
-      case 0:
-        return const FeedPage();
-      case 4:
-        return ProfilePage(user: currentUser);
-      default:
-        return const Center(child: Text('미완성'));
-    }
-  }
+    return IndexedStack(
+      index: _currentIndex,
+      children: [
+        const FeedPage(),                      // 0번 탭: 피드
+        const Center(child: Text('Search')),   // 1번 탭
+        const Center(child: Text('Create')),   // 2번 탭
+        const Center(child: Text('Reels')),    // 3번 탭
 
-  // ░░ 탭별 AppBar 스위치 ░░
-  PreferredSizeWidget _buildAppBar() {
-    switch (_currentIndex) {
-      case 0:
-        return AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0.5,
-          titleSpacing: 16,
-          title: const Text(
-            'Instagram',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 24,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.favorite_border),
-              color: Colors.black,
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => const NotificationsPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.send),
-              color: Colors.black,
-              onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => const DmListPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-
-      case 4:
-        return AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0.5,
-          titleSpacing: 16,
-          title: Row(
-            children: [
-              Text(
-                currentUser.userNickName,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 4),
-              const Icon(
-                Icons.keyboard_arrow_down,
-                size: 20,
-                color: Colors.black,
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add_box_outlined),
-              color: Colors.black,
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.menu),
-              color: Colors.black,
-              onPressed: () {},
-            ),
-          ],
-        );
-
-      default:
-        return AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0.5,
-          titleSpacing: 16,
-          title: const Text(
-            'Instagram',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-            ),
-          ),
-        );
-    }
+        // 4번 탭: 프로필 네비게이터
+        Navigator(
+          key: _profileNavigatorKey,
+          onGenerateRoute: (settings) {
+            return PageRouteBuilder(
+              pageBuilder: (_, __, ___) => ProfilePage(user: currentUser),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            );
+          },
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
       body: _buildBody(),
       bottomNavigationBar: BottomAppBar(
         child: Row(
