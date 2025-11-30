@@ -16,20 +16,50 @@ class CommentsBottomSheet extends StatefulWidget {
   State<CommentsBottomSheet> createState() => _CommentsBottomSheetState();
 }
 
+// UI 전용 래퍼: 대댓글 여부 / 부모 id 저장
+class _UiComment {
+  final Comment comment;
+  final bool isReply;
+  final String? parentId;
+
+  _UiComment({
+    required this.comment,
+    this.isReply = false,
+    this.parentId,
+  });
+}
+
 class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _inputFocusNode = FocusNode();
+
+  // 화면에 보여줄 댓글 리스트
+  late List<_UiComment> _items;
+
+  // 지금 어느 댓글에 대댓글 달려고 하는지
+  Comment? _replyTarget;
+
+  // 한 번이라도 대댓글을 단 부모 댓글 id -> "Reply to ..." 숨기기용
+  final Set<String> _repliedParentIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    final baseList = commentsByPostId[widget.post.id] ?? <Comment>[];
+    _items = baseList
+        .map((c) => _UiComment(comment: c, isReply: false, parentId: null))
+        .toList();
+  }
 
   @override
   void dispose() {
     _controller.dispose();
+    _inputFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Comment> comments =
-        commentsByPostId[widget.post.id] ?? <Comment>[];
-
     return SafeArea(
       top: false,
       child: Padding(
@@ -52,9 +82,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               const Divider(height: 1),
 
               Expanded(
-                child: comments.isEmpty
+                child: _items.isEmpty
                     ? _buildEmptyComments()
-                    : _buildCommentsList(comments),
+                    : _buildCommentsList(),
               ),
 
               // 이모지 위 divider
@@ -130,27 +160,31 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     );
   }
 
-  Widget _buildCommentsList(List<Comment> comments) {
+  Widget _buildCommentsList() {
     final postAuthor = usersById[widget.post.authorid];
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: comments.length,
+      itemCount: _items.length,
       itemBuilder: (context, index) {
-        final c = comments[index];
+        final ui = _items[index];
+        final c = ui.comment;
         final user = usersById[c.authorId];
 
         // 이 댓글이 게시물 작성자의 댓글인가?
         final bool isAuthorComment = c.authorId == widget.post.authorid;
 
         // "게시물 작성자가 이 댓글에 좋아요 눌렀는가?"
-        // like == true 이고, 댓글 작성자는 게시물 작성자가 아님
         final bool likedByPostAuthor = c.like && !isAuthorComment;
 
         final String timeText = _timeAgoShort(c.createdAt);
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.only(
+            top: 10,
+            bottom: 10,
+            left: ui.isReply ? 40 : 0, // 대댓글이면 왼쪽 여백
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -233,12 +267,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         children: const [
                           Text(
                             'Reply',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style:
+                            TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                           SizedBox(width: 12),
                           Text(
                             'See translation',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style:
+                            TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -248,37 +284,64 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         children: const [
                           Text(
                             'Reply',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style:
+                            TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                           SizedBox(width: 12),
                           Text(
                             'Reply with a reel',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style:
+                            TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                           SizedBox(width: 12),
                           Text(
                             'Hide',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style:
+                            TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
 
                       const SizedBox(height: 8),
 
-                      // 인스타처럼 "Reply to haetbaaaan…" 표시
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 12,
-                            backgroundImage: AssetImage(currentUser.profileImagePath),
+                      // 대댓글 아직 안 달았고, 이 댓글이 "부모"일 때만 표시
+                      if (!ui.isReply &&
+                          !_repliedParentIds.contains(c.id))
+                        GestureDetector(
+                          onTap: () {
+                            // 입력창에 @닉네임 채우고 포커스
+                            final nick = user?.userNickName ?? '';
+                            setState(() {
+                              _replyTarget = c;
+                              _controller.text = '@$nick ';
+                              _controller.selection =
+                                  TextSelection.fromPosition(
+                                    TextPosition(
+                                      offset: _controller.text.length,
+                                    ),
+                                  );
+                            });
+                            FocusScope.of(context)
+                                .requestFocus(_inputFocusNode);
+                          },
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundImage:
+                                AssetImage(currentUser.profileImagePath),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Reply to ${user?.userNickName ?? ''}…',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Reply to ${user?.userNickName ?? ''}…',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          )
-                        ],
-                      )
+                        ),
                     ],
                   ],
                 ),
@@ -359,6 +422,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: _inputFocusNode,
               decoration: const InputDecoration(
                 hintText: 'Add a comment...',
                 border: InputBorder.none,
@@ -368,28 +432,76 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           IconButton(
             icon: const Icon(Icons.send),
             splashRadius: 20,
-            onPressed: () {
-              final text = _controller.text.trim();
-              if (text.isEmpty) return;
-
-              final newComment = Comment(
-                id: 'local_${DateTime.now().millisecondsSinceEpoch}',
-                postid: widget.post.id,
-                authorId: currentUser.id,
-                text: text,
-                createdAt: DateTime.now(),
-              );
-
-              setState(() {
-                final list = commentsByPostId[widget.post.id] ?? <Comment>[];
-                commentsByPostId[widget.post.id] = [...list, newComment];
-                _controller.clear();
-              });
-            },
+            onPressed: _handleSend,
           ),
         ],
       ),
     );
+  }
+
+  void _handleSend() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    final now = DateTime.now();
+    final newComment = Comment(
+      id: 'local_${now.millisecondsSinceEpoch}',
+      postid: widget.post.id,
+      authorId: currentUser.id,
+      text: text,
+      createdAt: now,
+    );
+
+    final bool isReply = _replyTarget != null;
+    final String? parentId = _replyTarget?.id;
+
+    // 더미 데이터에도 저장
+    final list = commentsByPostId[widget.post.id] ?? <Comment>[];
+    list.add(newComment);
+    commentsByPostId[widget.post.id] = list;
+
+    setState(() {
+      if (isReply && parentId != null) {
+        // 1) 부모 index 찾기
+        final parentIndex = _items.indexWhere((e) => e.comment.id == parentId);
+
+        // 2) 이미 이 부모에 달린 대댓글들이 있는지 찾기
+        int insertIndex = parentIndex + 1;
+
+        while (
+        insertIndex < _items.length &&
+            _items[insertIndex].isReply &&
+            _items[insertIndex].parentId == parentId
+        ) {
+          insertIndex++;
+        }
+
+        // 3) 그 위치에 삽입
+        _items.insert(
+          insertIndex,
+          _UiComment(
+            comment: newComment,
+            isReply: true,
+            parentId: parentId,
+          ),
+        );
+
+        // Reply-to 표시 제거
+        _repliedParentIds.add(parentId);
+      } else {
+        // 일반 댓글은 맨 마지막
+        _items.add(
+          _UiComment(
+            comment: newComment,
+            isReply: false,
+            parentId: null,
+          ),
+        );
+      }
+
+      _replyTarget = null;
+      _controller.clear();
+    });
   }
 
   // ───────── 시간 표시 헬퍼 (s / m / h / d / w / y) ─────────
