@@ -60,6 +60,7 @@ class _DmMessagePageState extends State<DmMessagePage> {
     }
   }
 
+  // 텍스트 DM 보내기
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
@@ -83,6 +84,33 @@ class _DmMessagePageState extends State<DmMessagePage> {
 
       _controller.clear();
       _hasText = false;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  // 이미지 DM 보내기
+  void _sendImageMessage(String imagePath) {
+    final msg = DmMessage(
+      messageId: 'local_img_${DateTime.now().millisecondsSinceEpoch}',
+      threadId: widget.thread.threadId,
+      type: DmMessageType.image,
+      text: null,
+      mediaPath: imagePath,
+      createdAt: DateTime.now(),
+      isMine: true,
+    );
+
+    setState(() {
+      _messages.add(msg);
+
+      final list =
+          dmMessagesByThreadId[widget.thread.threadId] ?? <DmMessage>[];
+      dmMessagesByThreadId[widget.thread.threadId] = [...list, msg];
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -147,6 +175,7 @@ class _DmMessagePageState extends State<DmMessagePage> {
       ),
       body: Column(
         children: [
+          // ───────── 메시지 리스트 ─────────
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -194,7 +223,31 @@ class _DmMessagePageState extends State<DmMessagePage> {
                               ),
                             ),
                           Flexible(
-                            child: _buildMessageBubble(msg, isMine),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                msg.type == DmMessageType.image ? 0 : 12,
+                                vertical:
+                                msg.type == DmMessageType.image ? 0 : 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: msg.type == DmMessageType.image
+                                    ? Colors.transparent
+                                    : (isMine
+                                    ? const Color(0xFF8338FF)
+                                    : const Color(0xFFF0F0F0)),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(18),
+                                  topRight: const Radius.circular(18),
+                                  bottomLeft:
+                                  Radius.circular(isMine ? 18 : 4),
+                                  bottomRight:
+                                  Radius.circular(isMine ? 4 : 18),
+                                ),
+                              ),
+                              child: _buildMessageContent(msg, isMine),
+                            ),
                           ),
                           if (isMine) const SizedBox(width: 4),
                         ],
@@ -220,14 +273,15 @@ class _DmMessagePageState extends State<DmMessagePage> {
             ),
           ),
 
+          // ───────── 입력 바 ─────────
           _buildInputBar(),
         ],
       ),
     );
   }
 
-  /// 텍스트 / 이미지 공용 말풍선
-  Widget _buildMessageBubble(DmMessage msg, bool isMine) {
+  // 텍스트 / 이미지 메시지 내용 빌드
+  Widget _buildMessageContent(DmMessage msg, bool isMine) {
     if (msg.type == DmMessageType.image && msg.mediaPath != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -239,27 +293,12 @@ class _DmMessagePageState extends State<DmMessagePage> {
       );
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        color: isMine ? const Color(0xFF8338FF) : const Color(0xFFF0F0F0),
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(18),
-          topRight: const Radius.circular(18),
-          bottomLeft: Radius.circular(isMine ? 18 : 4),
-          bottomRight: Radius.circular(isMine ? 4 : 18),
-        ),
-      ),
-      child: Text(
-        msg.text ?? '',
-        style: TextStyle(
-          fontSize: 14,
-          color: isMine ? Colors.white : Colors.black,
-        ),
+    // 기본 텍스트
+    return Text(
+      msg.text ?? '',
+      style: TextStyle(
+        fontSize: 14,
+        color: isMine ? Colors.white : Colors.black,
       ),
     );
   }
@@ -351,15 +390,16 @@ class _DmMessagePageState extends State<DmMessagePage> {
                                 context: context,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
-                                builder: (_) => DmMediaPickerBottomSheet(
-                                  onSelect: (imagePath) {
-                                    // 나중에 이미지 전송 로직 연결
-                                  },
-                                ),
+                                builder: (sheetContext) =>
+                                    DmMediaPickerBottomSheet(
+                                      onSelect: (imagePath) {
+                                        // 여기서는 pop 안 하고, 바텀시트 안에서 pop
+                                        _sendImageMessage(imagePath);
+                                      },
+                                    ),
                               );
                             },
-                            child:
-                            const Icon(Icons.image_outlined, size: 22),
+                            child: const Icon(Icons.image_outlined, size: 22),
                           ),
                           const SizedBox(width: 8),
                           const Icon(Icons.emoji_emotions_outlined, size: 22),
