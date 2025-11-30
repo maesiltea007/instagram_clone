@@ -9,6 +9,7 @@ import 'package:instagram/pages/instagram_main.dart';
 
 class PostCaptionPage extends StatefulWidget {
   final String imagePath;
+
   const PostCaptionPage({
     super.key,
     required this.imagePath,
@@ -24,12 +25,15 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
   @override
   void initState() {
     super.initState();
-    // 화면 들어오자마자 한 번만 바텀시트 표시
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showCaptionBottomSheet();
     });
   }
 
+  // ───────────────────────────────────────────────
+  // 게시글 업로드
+  // ───────────────────────────────────────────────
   void _uploadPost() {
     final caption = _captionController.text.trim();
 
@@ -44,17 +48,17 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     );
 
     upsertUserPost(newPost);
+    scheduleAutoCommentForPost(newPost.id);
 
-    scheduleAutoCommentForPost(newPost.id); //더미 댓글달기
-
-    Navigator.of(context).pushAndRemoveUntil(
+    // ★ 여기가 핵심 수정
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => InstagramMain(
           title: 'Instagram',
-          initialIndex: 4, // 프로필 탭
+          initialIndex: 4,
         ),
-        transitionDuration: Duration.zero,        // ← 슬라이드 제거
-        reverseTransitionDuration: Duration.zero, // ← 뒤로 갈 때도 제거
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
           (route) => false,
     );
@@ -66,6 +70,9 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     super.dispose();
   }
 
+  // ───────────────────────────────────────────────
+  // 첫 BottomSheet
+  // ───────────────────────────────────────────────
   void _showCaptionBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -77,6 +84,10 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
       builder: (_) => const PostCaptionBottomSheet1(),
     );
   }
+
+  // ───────────────────────────────────────────────
+  // UI
+  // ───────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -101,16 +112,16 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
           ),
         ),
       ),
+
       body: Column(
         children: [
-          // 위쪽 내용 스크롤
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   const SizedBox(height: 12),
 
-                  // ───── 이미지 + 캡션 (세로 배치) ─────
+                  // 이미지 + 캡션
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
@@ -142,7 +153,7 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
 
                   const SizedBox(height: 8),
 
-                  // ───── Poll / Prompt 버튼 ─────
+                  // Poll / Prompt
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -163,11 +174,8 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                   ),
 
                   const SizedBox(height: 12),
-
-                  // 얇은 divider (caption 영역 아래 딱 한 줄)
                   _thinDivider(),
 
-                  // ───── Tag people / Add location ─────
                   _menuTile(
                     icon: Icons.person_outline,
                     title: 'Tag people',
@@ -181,10 +189,8 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                     onTap: () {},
                   ),
 
-                  // 굵은 divider (Add location 아래 한 번)
                   _thickDivider(),
 
-                  // ───── Audience / Also share on… / More options ─────
                   _menuTile(
                     icon: Icons.remove_red_eye_outlined,
                     title: 'Audience',
@@ -192,7 +198,6 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                     onTap: () {},
                   ),
 
-                  // 얇은 divider (Audience와 Also share 사이 한 줄)
                   _thinDivider(),
 
                   _menuTile(
@@ -203,7 +208,6 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                     onTap: () {},
                   ),
 
-                  // 굵은 divider (Also share 아래 한 번)
                   _thickDivider(),
 
                   _menuTile(
@@ -218,13 +222,12 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
             ),
           ),
 
-          // ───── 아래 Share 버튼 고정 ─────
+          // Share 버튼
           SafeArea(
             top: false,
             child: Container(
               width: double.infinity,
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: SizedBox(
                 height: 44,
                 child: TextButton(
@@ -240,12 +243,13 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
                       isScrollControlled: false,
                       backgroundColor: Colors.white,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (sheetCtx) => PostCaptionBottomSheet2(
                         onOk: () {
-                          Navigator.of(sheetCtx).pop(); // bottom sheet 닫기
-                          _uploadPost();                // 업로드 + 화면 전환
+                          Navigator.of(sheetCtx).pop();
+                          _uploadPost();
                         },
                       ),
                     );
@@ -267,7 +271,7 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     );
   }
 
-  // ───────────────── helpers ─────────────────
+  // ───────────────────────────── helpers ─────────────────────────────
 
   Widget _thinDivider() {
     return Divider(
@@ -277,7 +281,6 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
     );
   }
 
-  // 인스타에서 섹션 사이 회색 띠처럼 보이게
   Widget _thickDivider() {
     return Container(
       height: 10,
@@ -349,10 +352,8 @@ class _PostCaptionPageState extends State<PostCaptionPage> {
           if (trailingNewBadge) ...[
             const SizedBox(width: 6),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 2,
-              ),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.blue,
                 borderRadius: BorderRadius.circular(999),
