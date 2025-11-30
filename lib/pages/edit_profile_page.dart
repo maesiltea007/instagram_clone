@@ -19,7 +19,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   static bool _hasShownPopup = false;
 
-  late String _profileImagePath; // 현재 페이지에서 쓰는 프로필 이미지 경로
+  late String _profileImagePath;
 
   @override
   void initState() {
@@ -46,7 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() {
             _profileImagePath = newPath;
 
-            // ★ 실제 더미 데이터 직접 수정 (copyWith 제거 버전)
+            // 더미 데이터 직접 수정
             currentUser.profileImagePath = newPath;
 
             final user = usersById[currentUser.id];
@@ -61,6 +61,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = widget.user; // 깔끔하게 줄여쓰기
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -132,10 +134,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           const SizedBox(height: 10),
 
-          _buildFieldBlock("Name", "puang"),
-          _buildFieldBlock("Username", "ta_junhyuk"),
-          _buildFieldBlock("Pronouns", ""),
-          _buildFieldBlock("Bio", "I’m gonna be the God of Flutter!"),
+          // ★ 실제 유저의 정보 표시
+          _buildFieldBlock("Name", user.userName),
+          _buildFieldBlock("Username", user.userNickName),
+          _buildFieldBlock("Pronouns", ""), // 현재 기능 없음
+          _buildFieldBlock("Bio", user.bio),
 
           _buildSectionItem("Add link"),
           _buildSectionItem("Add banners"),
