@@ -3,6 +3,7 @@ import 'package:instagram/pages/feed_page.dart';
 import 'package:instagram/pages/profile_page.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/widgets/create_post/after_post_bottom_sheet.dart';
+import 'package:instagram/app_flags.dart'; // ★ 전역 플래그
 
 class InstagramMain extends StatefulWidget {
   final String title;
@@ -20,7 +21,6 @@ class InstagramMain extends StatefulWidget {
 
 class _InstagramMainState extends State<InstagramMain> {
   late int _currentIndex;
-  bool _shouldShowAfterPostSheet = false;
 
   // 프로필 탭 전용 Navigator
   final GlobalKey<NavigatorState> _profileNavigatorKey =
@@ -31,8 +31,9 @@ class _InstagramMainState extends State<InstagramMain> {
     super.initState();
     _currentIndex = widget.initialIndex;
 
-    if (_currentIndex == 4) {
-      _shouldShowAfterPostSheet = true;
+    // initialIndex == 4 이고, 아직 한 번도 안 띄웠을 때만 실행
+    if (_currentIndex == 4 && !AppFlags.hasShownAfterPostSheet) {
+      AppFlags.hasShownAfterPostSheet = true; // 다시는 안 뜨게
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showAfterPostSheet();
       });
@@ -40,9 +41,6 @@ class _InstagramMainState extends State<InstagramMain> {
   }
 
   void _showAfterPostSheet() {
-    if (!_shouldShowAfterPostSheet) return;
-    _shouldShowAfterPostSheet = false;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: false,
@@ -79,10 +77,10 @@ class _InstagramMainState extends State<InstagramMain> {
     return IndexedStack(
       index: _currentIndex,
       children: [
-        const FeedPage(),                      // 0번 탭: 피드
-        const Center(child: Text('Search')),   // 1번 탭
-        const Center(child: Text('Create')),   // 2번 탭
-        const Center(child: Text('Reels')),    // 3번 탭
+        const FeedPage(), // 0번 탭: 피드
+        const Center(child: Text('Search')), // 1번 탭
+        const Center(child: Text('Create')), // 2번 탭
+        const Center(child: Text('Reels')), // 3번 탭
 
         // 4번 탭: 프로필 네비게이터
         Navigator(
