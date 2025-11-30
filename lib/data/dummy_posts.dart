@@ -249,6 +249,63 @@ final List<Post> dummyPosts = [
     showFeed: false,
   ),
 
+
+  //닝닝
+  Post(
+    id: '121',
+    authorid: '12',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/karinabluu_1.jpg'
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+  Post(
+    id: '122',
+    authorid: '12',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/karinabluu_2.jpg'
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+  Post(
+    id: '123',
+    authorid: '12',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/karinabluu_3.jpg'
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+  Post(
+    id: '124',
+    authorid: '12',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/karinabluu_4.jpg'
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+  Post(
+    id: '125',
+    authorid: '12',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/karinabluu_5.jpg'
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 ];
 
 

@@ -201,7 +201,7 @@ User user12 = User(
   profileImagePath:
   'assets/images/profile_images/ningning_profile_image.jpg',
   bio: '',
-  followerCount: 1,
+  followerCount: 1000,
   followingCount: 1,
 );
 
