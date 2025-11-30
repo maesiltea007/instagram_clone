@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
+import 'package:instagram/widgets/profile_edit/profile_edit_pop_up_1.dart';
 
-class EditProfilePage extends StatelessWidget {
-  final User user;  // ← 실제 유저 정보
+class EditProfilePage extends StatefulWidget {
+  final User user; // ★ 프로필 정보
 
   const EditProfilePage({
     super.key,
     required this.user,
   });
+
+  @override
+  State<EditProfilePage> createState() => _EditProfilePageState();
+}
+
+class _EditProfilePageState extends State<EditProfilePage> {
+  // 앱 실행 중에 이 페이지에서 팝업을 이미 한 번 보여줬는지
+  static bool _hasShownPopup = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 처음 진입한 경우에만 팝업
+    if (!_hasShownPopup) {
+      _hasShownPopup = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showProfileEditPopup1(context);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +53,7 @@ class EditProfilePage extends StatelessWidget {
         children: [
           const SizedBox(height: 12),
 
-          // ========== PROFILE PHOTO ==========
+          // PROFILE PHOTO
           Center(
             child: Column(
               children: [
@@ -42,8 +64,10 @@ class EditProfilePage extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        // ★ 여기서 실제 프로필 이미지 사용
-                        backgroundImage: AssetImage(user.profileImagePath),
+                        // ★ 실제 유저 프로필 이미지
+                        backgroundImage: AssetImage(
+                          widget.user.profileImagePath,
+                        ),
                       ),
                       const SizedBox(width: 24),
                       Container(
@@ -77,21 +101,17 @@ class EditProfilePage extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // ========== INPUT FIELDS ==========
           _buildFieldBlock("Name", "puang"),
           _buildFieldBlock("Username", "ta_junhyuk"),
           _buildFieldBlock("Pronouns", ""),
           _buildFieldBlock("Bio", "I’m gonna be the God of Flutter!"),
 
-          // ========== SECTION ITEMS ==========
           _buildSectionItem("Add link"),
           _buildSectionItem("Add banners"),
 
-          // ========== GENDER ==========
           _buildFieldTitle("Gender"),
           _buildSectionItemWithArrow("Prefer not to say"),
 
-          // ========== MUSIC ==========
           _buildSectionItemWithTrailing(
             "Music",
             trailing: "Add music to your profile",
@@ -99,7 +119,6 @@ class EditProfilePage extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // ========== BIG BUTTONS ==========
           _buildBigButton("Switch to professional account"),
           _buildDivider(),
           _buildBigButton("Personal information settings"),
@@ -111,11 +130,8 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // ======================================================
-  //                 BUILDERS FOR EXACT UI
-  // ======================================================
+  // ================== helpers ==================
 
-  // 필드 타이틀
   Widget _buildFieldTitle(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
@@ -129,7 +145,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 필드 + 밑줄
   Widget _buildFieldBlock(String title, String text) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +172,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 섹션 구분용 Divider
   Widget _buildDivider() {
     return const Divider(
       height: 1,
@@ -166,7 +180,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 기본 섹션 아이템
   Widget _buildSectionItem(String text) {
     return Column(
       children: [
@@ -186,7 +199,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 오른쪽 화살표 있는 섹션
   Widget _buildSectionItemWithArrow(String text) {
     return Column(
       children: [
@@ -208,7 +220,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 오른쪽 텍스트 있는 섹션
   Widget _buildSectionItemWithTrailing(
       String text, {
         required String trailing,
@@ -239,7 +250,6 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // 큰 버튼
   Widget _buildBigButton(String text) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),

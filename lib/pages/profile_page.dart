@@ -26,7 +26,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 8),
           _buildUserInfo(user),
           const SizedBox(height: 12),
-          _buildButtonsRow(context, user),      // ← user 넘김
+          _buildButtonsRow(context, user),
           const SizedBox(height: 16),
           _buildPostsSection(user, context),
           const SizedBox(height: 20),
@@ -248,6 +248,7 @@ class ProfilePage extends StatelessWidget {
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
+        // 마지막 칸: + 타일
         if (index == userPosts.length) {
           return _buildAddPostTile(context);
         }
