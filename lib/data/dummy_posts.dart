@@ -113,10 +113,141 @@ final List<Post> dummyPosts = [
     showFeed: false,
   ),
 
+  Post(
+    id: '60',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_60_1.jpg',
+      'assets/images/post_images/winter_60_1.jpg',
+      'assets/images/post_images/winter_60_1.jpg',
+      'assets/images/post_images/winter_60_1.jpg',
+      'assets/images/post_images/winter_60_1.jpg',
+      'assets/images/post_images/winter_60_1.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 
+  Post(
+    id: '61',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_61.jpg',
+      'assets/images/post_images/winter_61.jpg',
+      'assets/images/post_images/winter_61.jpg',
+      'assets/images/post_images/winter_61.jpg',
+      'assets/images/post_images/winter_61.jpg',
+      'assets/images/post_images/winter_61.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 
+  Post(
+    id: '62',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_62.jpg',
+      'assets/images/post_images/winter_62.jpg',
+      'assets/images/post_images/winter_62.jpg',
+      'assets/images/post_images/winter_62.jpg',
+      'assets/images/post_images/winter_62.jpg',
+      'assets/images/post_images/winter_62.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 
+  Post(
+    id: '63',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_63.jpg',
+      'assets/images/post_images/winter_63.jpg',
+      'assets/images/post_images/winter_63.jpg',
+      'assets/images/post_images/winter_63.jpg',
+      'assets/images/post_images/winter_63.jpg',
+      'assets/images/post_images/winter_63.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 
+  Post(
+    id: '64',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_64.jpg',
+      'assets/images/post_images/winter_64.jpg',
+      'assets/images/post_images/winter_64.jpg',
+      'assets/images/post_images/winter_64.jpg',
+      'assets/images/post_images/winter_64.jpg',
+      'assets/images/post_images/winter_64.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+
+  Post(
+    id: '65',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_65.jpg',
+      'assets/images/post_images/winter_65.jpg',
+      'assets/images/post_images/winter_65.jpg',
+      'assets/images/post_images/winter_65.jpg',
+      'assets/images/post_images/winter_65.jpg',
+      'assets/images/post_images/winter_65.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+
+  Post(
+    id: '66',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
+
+  Post(
+    id: '67',
+    authorid: '6',
+    caption: '',
+    mediaPaths: [
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+      'assets/images/post_images/winter_66.jpg',
+    ],
+    likeCount: 77,
+    createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
+  ),
 
 ];
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/data/dummy_posts.dart';
+import 'package:instagram/pages/profile_feed_page.dart';
 import 'package:instagram/widgets/post_cards/post_pop_up.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/pages/following_page.dart';
@@ -350,7 +351,7 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
     return Column(
       children: [
         _buildTabs(),
-        _buildGrid(posts),
+        _buildGrid(user, posts),
       ],
     );
   }
@@ -389,7 +390,7 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
     );
   }
 
-  Widget _buildGrid(List<Post> posts) {
+  Widget _buildGrid(User user, List<Post> posts) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -404,6 +405,19 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
       itemBuilder: (context, index) {
         final post = posts[index];
         return GestureDetector(
+          onTap: () {
+            // 프로필 피드로 이동, index 함께 전달
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => ProfileFeedPage(
+                  targetUser: user,
+                  initialIndex: index,
+                ),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          },
           onLongPressStart: (_) => _showPostPopup(context, post),
           onLongPressEnd: (_) => _hidePostPopup(),
           child: Image.asset(
