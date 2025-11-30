@@ -3,6 +3,7 @@ import 'package:instagram/models/user.dart';
 import 'package:instagram/widgets/profile_edit/profile_edit_pop_up_1.dart';
 import 'package:instagram/widgets/profile_edit/profile_photo_bottom_sheet.dart';
 import 'package:instagram/data/dummy_users.dart'; // currentUser, usersById
+import 'package:instagram/pages/change_name_page.dart';
 
 class EditProfilePage extends StatefulWidget {
   final User user;
@@ -48,7 +49,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
             // 더미 데이터 직접 수정
             currentUser.profileImagePath = newPath;
-
             final user = usersById[currentUser.id];
             if (user != null) {
               user.profileImagePath = newPath;
@@ -59,9 +59,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  Future<void> _openChangeNamePage(User user) async {
+    final newName = await Navigator.of(context).push<String>(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => ChangeNamePage(user: user),
+        transitionDuration: Duration.zero,          // ★ 애니메이션 제거
+        reverseTransitionDuration: Duration.zero,   // ★ 애니메이션 제거
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty) {
+      setState(() {
+        // user.userName은 ChangeNamePage에서 이미 수정됨
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = widget.user; // 깔끔하게 줄여쓰기
+    final user = widget.user;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -134,10 +150,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           const SizedBox(height: 10),
 
-          // ★ 실제 유저의 정보 표시
-          _buildFieldBlock("Name", user.userName),
+          // 실제 유저 정보 표시
+          _buildFieldBlock(
+            "Name",
+            user.userName,
+            onTap: () => _openChangeNamePage(user), // ★ 전체 줄 터치
+          ),
           _buildFieldBlock("Username", user.userNickName),
-          _buildFieldBlock("Pronouns", ""), // 현재 기능 없음
+          _buildFieldBlock("Pronouns", ""),
           _buildFieldBlock("Bio", user.bio),
 
           _buildSectionItem("Add link"),
@@ -179,23 +199,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildFieldBlock(String title, String text) {
+  /// 전체 줄 터치 가능하게 InkWell을 **라인 전체**에 감쌈
+  Widget _buildFieldBlock(
+      String title,
+      String text, {
+        VoidCallback? onTap,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildFieldTitle(title),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black,
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10, // 터치 영역 넉넉하게
+            ),
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
         const Padding(
-          padding: EdgeInsets.only(left: 16, right: 16, top: 12),
+          padding: EdgeInsets.only(left: 16, right: 16, top: 0),
           child: Divider(
             height: 1,
             thickness: 0.5,
