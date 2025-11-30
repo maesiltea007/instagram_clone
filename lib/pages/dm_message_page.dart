@@ -67,7 +67,9 @@ class _DmMessagePageState extends State<DmMessagePage> {
     final msg = DmMessage(
       messageId: 'local_${DateTime.now().millisecondsSinceEpoch}',
       threadId: widget.thread.threadId,
+      type: DmMessageType.text,
       text: text,
+      mediaPath: null,
       createdAt: DateTime.now(),
       isMine: true,
     );
@@ -192,33 +194,7 @@ class _DmMessagePageState extends State<DmMessagePage> {
                               ),
                             ),
                           Flexible(
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isMine
-                                    ? const Color(0xFF8338FF)
-                                    : const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: const Radius.circular(18),
-                                  topRight: const Radius.circular(18),
-                                  bottomLeft:
-                                  Radius.circular(isMine ? 18 : 4),
-                                  bottomRight:
-                                  Radius.circular(isMine ? 4 : 18),
-                                ),
-                              ),
-                              child: Text(
-                                msg.text,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: isMine ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
+                            child: _buildMessageBubble(msg, isMine),
                           ),
                           if (isMine) const SizedBox(width: 4),
                         ],
@@ -250,7 +226,44 @@ class _DmMessagePageState extends State<DmMessagePage> {
     );
   }
 
-  // 하단 입력 바
+  /// 텍스트 / 이미지 공용 말풍선
+  Widget _buildMessageBubble(DmMessage msg, bool isMine) {
+    if (msg.type == DmMessageType.image && msg.mediaPath != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(
+          msg.mediaPath!,
+          width: 200,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: isMine ? const Color(0xFF8338FF) : const Color(0xFFF0F0F0),
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMine ? 18 : 4),
+          bottomRight: Radius.circular(isMine ? 4 : 18),
+        ),
+      ),
+      child: Text(
+        msg.text ?? '',
+        style: TextStyle(
+          fontSize: 14,
+          color: isMine ? Colors.white : Colors.black,
+        ),
+      ),
+    );
+  }
+
   // 하단 입력 바
   Widget _buildInputBar() {
     return SafeArea(
@@ -340,12 +353,13 @@ class _DmMessagePageState extends State<DmMessagePage> {
                                 backgroundColor: Colors.transparent,
                                 builder: (_) => DmMediaPickerBottomSheet(
                                   onSelect: (imagePath) {
-                                    // TODO: imagePath로 이미지 DM 보내는 로직 (지금은 텍스트만 있으니까 나중에 추가)
+                                    // 나중에 이미지 전송 로직 연결
                                   },
                                 ),
                               );
                             },
-                            child: const Icon(Icons.image_outlined, size: 22),
+                            child:
+                            const Icon(Icons.image_outlined, size: 22),
                           ),
                           const SizedBox(width: 8),
                           const Icon(Icons.emoji_emotions_outlined, size: 22),
