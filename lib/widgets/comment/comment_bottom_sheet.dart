@@ -32,32 +32,38 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 
     return SafeArea(
       top: false,
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      child: Padding(
+        // 키보드 높이만큼 아래 패딩
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            _buildDragHandle(),
-            const SizedBox(height: 8),
-            _buildHeader(),
-            const Divider(height: 1),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              _buildDragHandle(),
+              const SizedBox(height: 8),
+              _buildHeader(),
+              const Divider(height: 1),
 
-            Expanded(
-              child: comments.isEmpty
-                  ? _buildEmptyComments()
-                  : _buildCommentsList(comments),
-            ),
+              Expanded(
+                child: comments.isEmpty
+                    ? _buildEmptyComments()
+                    : _buildCommentsList(comments),
+              ),
 
-            // 이모지 위 divider
-            Divider(height: 1, color: Colors.grey.shade300),
+              // 이모지 위 divider
+              Divider(height: 1, color: Colors.grey.shade300),
 
-            _buildEmojiRow(),
-            _buildInputRow(),
-          ],
+              _buildEmojiRow(),
+              _buildInputRow(),
+            ],
+          ),
         ),
       ),
     );
