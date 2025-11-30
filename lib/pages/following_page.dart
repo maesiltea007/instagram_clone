@@ -75,74 +75,75 @@ class FollowingPage extends StatelessWidget {
         ),
 
         // ========= Sync contacts 영역 =========
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Colors.grey.shade400,
-                    width: 1,
+        if (owner.id == currentUser.id) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: Colors.grey.shade400,
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.contacts_outlined,
+                    color: Colors.black,
+                    size: 22,
                   ),
                 ),
-                child: const Icon(
-                  Icons.contacts_outlined,
-                  color: Colors.black,
-                  size: 22,
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Sync contacts',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Find people you know',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Sync contacts',
+                Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3897F0),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Sync',
                       style: TextStyle(
-                        fontSize: 14,
+                        color: Colors.white,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Find people you know',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 32,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF3897F0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Sync',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.close, size: 18, color: Colors.grey),
-            ],
+                const SizedBox(width: 8),
+                const Icon(Icons.close, size: 18, color: Colors.grey),
+              ],
+            ),
           ),
-        ),
-
-        const SizedBox(height: 12),
+          const SizedBox(height: 12),
+        ],
 
         // ========= Sorted by Default =========
         Padding(
@@ -248,6 +249,8 @@ class _FollowingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool amIFollowing = isFollowing(currentUser.id, user.id);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: Row(
@@ -257,6 +260,7 @@ class _FollowingListItem extends StatelessWidget {
             backgroundImage: AssetImage(user.profileImagePath),
           ),
           const SizedBox(width: 12),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,25 +285,29 @@ class _FollowingListItem extends StatelessWidget {
               ],
             ),
           ),
+
           const SizedBox(width: 8),
+
+          // FOLLOW or MESSAGE
           Container(
             height: 30,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: amIFollowing ? const Color(0xFFF5F5F5) : const Color(0xFF3897F0),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'Message',
+                amIFollowing ? 'Message' : 'Follow',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Colors.black,
+                  color: amIFollowing ? Colors.black : Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ),
+
           const SizedBox(width: 4),
           const Icon(
             Icons.more_vert,
