@@ -4,18 +4,48 @@ import 'package:instagram/data/dummy_posts.dart';
 import 'package:instagram/models/post.dart';
 import 'package:instagram/widgets/create_post/create_bottom_sheet.dart';
 import 'package:instagram/pages/edit_profile_page.dart';
+import 'package:instagram/widgets/post_cards/post_pop_up.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final User user;
 
   const ProfilePage({super.key, required this.user});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  OverlayEntry? _postOverlay;
 
   int _getPostCountForUser(User user) {
     return dummyPosts.where((Post post) => post.authorid == user.id).length;
   }
 
+  void _showPostPopup(BuildContext context, Post post) {
+    _hidePostPopup(); // 혹시 남아 있던 거 제거
+
+    _postOverlay = OverlayEntry(
+      builder: (_) => PostPopUp(post: post),
+    );
+
+    Overlay.of(context, rootOverlay: true).insert(_postOverlay!);
+  }
+
+  void _hidePostPopup() {
+    _postOverlay?.remove();
+    _postOverlay = null;
+  }
+
+  @override
+  void dispose() {
+    _hidePostPopup();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = widget.user;
     final postCount = _getPostCountForUser(user);
 
     return SingleChildScrollView(
@@ -125,7 +155,8 @@ class ProfilePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(
                     PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => EditProfilePage(user: user),
+                      pageBuilder: (_, __, ___) =>
+                          EditProfilePage(user: user),
                       transitionDuration: Duration.zero,
                       reverseTransitionDuration: Duration.zero,
                     ),
@@ -259,21 +290,13 @@ class ProfilePage extends StatelessWidget {
 
         final post = userPosts[index];
 
-        if (!post.isVideo) {
-          return Image.asset(
+        // 사진 게시물만 있다고 했으니 바로 이미지
+        return GestureDetector(
+          onLongPressStart: (_) => _showPostPopup(context, post),
+          onLongPressEnd: (_) => _hidePostPopup(),
+          child: Image.asset(
             post.mediaPaths.first,
             fit: BoxFit.cover,
-          );
-        }
-
-        return Container(
-          color: Colors.black12,
-          child: const Center(
-            child: Icon(
-              Icons.play_circle_outline,
-              color: Colors.white,
-              size: 32,
-            ),
           ),
         );
       },
