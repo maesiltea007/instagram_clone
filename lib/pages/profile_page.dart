@@ -5,6 +5,7 @@ import 'package:instagram/models/post.dart';
 import 'package:instagram/widgets/create_post/create_bottom_sheet.dart';
 import 'package:instagram/pages/edit_profile_page.dart';
 import 'package:instagram/widgets/post_cards/post_pop_up.dart';
+import 'package:instagram/pages/following_page.dart'; // ★ 추가
 
 class ProfilePage extends StatefulWidget {
   final User user;
@@ -52,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(user, postCount),
+          _buildHeader(context, user, postCount), // ★ context 넘김
           const SizedBox(height: 8),
           _buildUserInfo(user),
           const SizedBox(height: 12),
@@ -66,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ───────────────── 헤더 ─────────────────
-  Widget _buildHeader(User user, int postCount) {
+  Widget _buildHeader(BuildContext context, User user, int postCount) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -101,10 +102,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         count: user.followerCount,
                       ),
                     ),
+                    // ★ following 부분만 탭 가능
                     Expanded(
-                      child: _StatItem(
-                        label: 'following',
-                        count: user.followingCount,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  FollowingPage(owner: user),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        },
+                        child: _StatItem(
+                          label: 'following',
+                          count: user.followingCount,
+                        ),
                       ),
                     ),
                   ],
