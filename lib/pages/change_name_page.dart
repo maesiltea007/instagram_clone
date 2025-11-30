@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
-import 'package:instagram/data/dummy_users.dart'; // currentUser, usersById
+import 'package:instagram/data/dummy_users.dart';
+import 'package:instagram/widgets/profile_edit/change_name_pop_up.dart';
 
 class ChangeNamePage extends StatefulWidget {
   final User user;
@@ -36,20 +37,35 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
       return;
     }
 
-    // 실제 더미 데이터 업데이트
-    widget.user.userName = newName;
+    // 체크 버튼 → 확인 팝업 먼저 띄우기
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => ChangeNamePopUp(
+        newName: newName,
+        onConfirm: () {
+          Navigator.of(context).pop(); // 팝업 닫기
 
-    if (currentUser.id == widget.user.id) {
-      currentUser.userName = newName;
-    }
+          // 실제 데이터 업데이트
+          widget.user.userName = newName;
 
-    final mapUser = usersById[widget.user.id];
-    if (mapUser != null) {
-      mapUser.userName = newName;
-    }
+          if (currentUser.id == widget.user.id) {
+            currentUser.userName = newName;
+          }
 
-    // 호출한 쪽으로 새 이름 전달
-    Navigator.pop(context, newName);
+          final mapUser = usersById[widget.user.id];
+          if (mapUser != null) {
+            mapUser.userName = newName;
+          }
+
+          // 이전 페이지로 값 전달
+          Navigator.of(context).pop(newName);
+        },
+        onCancel: () {
+          Navigator.of(context).pop(); // 팝업만 닫기
+        },
+      ),
+    );
   }
 
   @override
