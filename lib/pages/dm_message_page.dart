@@ -19,6 +19,7 @@ class DmMessagePage extends StatefulWidget {
 class _DmMessagePageState extends State<DmMessagePage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool get _hasText => _controller.text.trim().isNotEmpty;
 
   List<DmMessage> _messages = [];
 
@@ -245,69 +246,106 @@ class _DmMessagePageState extends State<DmMessagePage> {
           color: Colors.white,
           border: Border(top: BorderSide(color: Color(0xFFE0E0E0))),
         ),
-        child: Row(
-          children: [
-            // 왼쪽 카메라 동그라미
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: const Color(0xFF8338FF),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.camera_alt_outlined,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 8),
+        child: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _controller,
+          builder: (context, value, _) {
+            final hasText = value.text.trim().isNotEmpty;
 
-            // 텍스트 입력 필드
-            Expanded(
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F1F1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: TextField(
-                  controller: _controller,
-                  minLines: 1,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'Message...',
-                    border: InputBorder.none,
+            return Row(
+              children: [
+                // ───── 왼쪽 아이콘 부분 ─────
+                if (!hasText)
+                  _buildCameraCircle()                 // 카메라 동그라미
+                else
+                  const SizedBox(width: 34),           // 자리 맞추기용
+
+                const SizedBox(width: 8),
+
+                // ───── 가운데 텍스트 필드 ─────
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F1F1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: 'Message...',
+                        border: InputBorder.none,
+                        // 텍스트 있을 때만 돋보기 아이콘
+                        prefixIcon: hasText
+                            ? const Icon(
+                          Icons.search,
+                          size: 18,
+                          color: Colors.grey,
+                        )
+                            : null,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 8),
 
-            // Photo 버튼 (지금은 send 역할)
-            TextButton(
-              onPressed: _sendMessage,
-              style: TextButton.styleFrom(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                backgroundColor: const Color(0xFF1877F2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-              child: const Text(
-                'Photo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+                const SizedBox(width: 8),
+
+                // ───── 오른쪽 아이콘/버튼 부분 ─────
+                if (!hasText)
+                  Row(
+                    children: const [
+                      Icon(Icons.mic_none, size: 22),
+                      SizedBox(width: 8),
+                      Icon(Icons.image_outlined, size: 22),
+                      SizedBox(width: 8),
+                      Icon(Icons.emoji_emotions_outlined, size: 22),
+                      SizedBox(width: 8),
+                      Icon(Icons.add, size: 22),
+                    ],
+                  )
+                else
+                // 종이비행기(전송) 버튼
+                  InkWell(
+                    onTap: _sendMessage,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF8338FF),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.send,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _buildCameraCircle() {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: const BoxDecoration(
+        color: Color(0xFF8338FF),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.camera_alt_outlined,
+        color: Colors.white,
+        size: 18,
       ),
     );
   }
