@@ -4,6 +4,7 @@ import 'package:instagram/widgets/profile_edit/profile_edit_pop_up_1.dart';
 import 'package:instagram/widgets/profile_edit/profile_photo_bottom_sheet.dart';
 import 'package:instagram/data/dummy_users.dart'; // currentUser, usersById
 import 'package:instagram/pages/change_name_page.dart';
+import 'package:instagram/pages/change_bio_page.dart'; // ★ 추가
 
 class EditProfilePage extends StatefulWidget {
   final User user;
@@ -36,6 +37,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+  // ───────── 프로필 사진 바텀시트 ─────────
   void _openProfilePhotoSheet() {
     showModalBottomSheet(
       context: context,
@@ -59,18 +61,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // ───────── Name 수정 페이지 ─────────
   Future<void> _openChangeNamePage(User user) async {
     final newName = await Navigator.of(context).push<String>(
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => ChangeNamePage(user: user),
-        transitionDuration: Duration.zero,          // ★ 애니메이션 제거
-        reverseTransitionDuration: Duration.zero,   // ★ 애니메이션 제거
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
     );
 
     if (newName != null && newName.isNotEmpty) {
       setState(() {
-        // user.userName은 ChangeNamePage에서 이미 수정됨
+        // ChangeNamePage 안에서 user.userName, 더미 데이터 이미 수정됨
+      });
+    }
+  }
+
+  // ───────── Bio 수정 페이지 ─────────
+  Future<void> _openChangeBioPage(User user) async {
+    final newBio = await Navigator.of(context).push<String>(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => ChangeBioPage(user: user),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+
+    if (newBio != null) {
+      setState(() {
+        // ChangeBioPage 안에서 user.bio, 더미 데이터 이미 수정됨
       });
     }
   }
@@ -99,7 +119,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           const SizedBox(height: 12),
 
-          // PROFILE PHOTO
+          // ───────── PROFILE PHOTO ─────────
           Center(
             child: Column(
               children: [
@@ -150,15 +170,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           const SizedBox(height: 10),
 
-          // 실제 유저 정보 표시
+          // ───────── 실제 유저 정보 필드 ─────────
           _buildFieldBlock(
             "Name",
             user.userName,
-            onTap: () => _openChangeNamePage(user), // ★ 전체 줄 터치
+            onTap: () => _openChangeNamePage(user),
           ),
           _buildFieldBlock("Username", user.userNickName),
           _buildFieldBlock("Pronouns", ""),
-          _buildFieldBlock("Bio", user.bio),
+          _buildFieldBlock(
+            "Bio",
+            user.bio,
+            onTap: () => _openChangeBioPage(user), // ★ Bio 편집 연결
+          ),
 
           _buildSectionItem("Add link"),
           _buildSectionItem("Add banners"),
@@ -199,7 +223,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  /// 전체 줄 터치 가능하게 InkWell을 **라인 전체**에 감쌈
+  /// 한 줄 전체 터치 가능 필드
   Widget _buildFieldBlock(
       String title,
       String text, {
@@ -215,7 +239,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 10, // 터치 영역 넉넉하게
+              vertical: 10,
             ),
             child: Text(
               text,
