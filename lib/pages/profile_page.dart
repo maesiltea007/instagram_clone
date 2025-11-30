@@ -139,10 +139,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         count: user.followerCount,
                       ),
                     ),
+
+                    // ★ FollowingPage push 시 await + setState() 필요
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onTap: () async {
+                          await Navigator.of(context).push(
                             PageRouteBuilder(
                               pageBuilder: (_, __, ___) =>
                                   FollowingPage(owner: user),
@@ -150,6 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               reverseTransitionDuration: Duration.zero,
                             ),
                           );
+                          setState(() {}); // 돌아오면 즉시 갱신
                         },
                         child: _StatItem(
                           label: 'following',
@@ -202,9 +205,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 border: Border.all(color: border),
               ),
               child: TextButton(
-                onPressed: () {
-                  // 이 페이지 위에 전체 화면으로 띄워야 하니까 그냥 push
-                  Navigator.of(context).push(
+                // ★ EditProfilePage push → await → setState()
+                onPressed: () async {
+                  final updated = await Navigator.of(context).push<bool>(
                     PageRouteBuilder(
                       pageBuilder: (_, __, ___) =>
                           EditProfilePage(user: user),
@@ -212,6 +215,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       reverseTransitionDuration: Duration.zero,
                     ),
                   );
+
+                  if (updated == true) {
+                    setState(() {}); // 즉시 갱신
+                  }
                 },
                 child: const Text(
                   'Edit profile',

@@ -43,7 +43,8 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = widget.target;
+    // 항상 최신 dummy_users 기준으로 타깃 유저 가져오기
+    final user = usersById[widget.target.id] ?? widget.target;
     final postCount = _getPostCountFor(user);
 
     return Scaffold(
@@ -121,7 +122,8 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
                   onTap: () {
                     Navigator.of(context).push(
                       PageRouteBuilder(
-                        pageBuilder: (_, __, ___) => FollowingPage(owner: user),
+                        pageBuilder: (_, __, ___) =>
+                            FollowingPage(owner: user),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: Duration.zero,
                       ),
@@ -282,6 +284,8 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
                   } else {
                     followUser(currentUser.id, user.id);
                   }
+                  // currentUser / target 유저 둘 다 dummy_users 안에서 이미 변경된다고 가정
+                  // setState로 이 페이지는 즉시 리빌드
                 });
               },
               child: Container(

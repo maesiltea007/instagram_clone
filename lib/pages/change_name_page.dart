@@ -30,42 +30,37 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
     super.dispose();
   }
 
-  void _onDone() {
+  Future<void> _onDone() async {
     final newName = _controller.text.trim();
     if (newName.isEmpty) {
       Navigator.pop(context);
       return;
     }
 
-    // 체크 버튼 → 확인 팝업 먼저 띄우기
-    showDialog(
+    // 1) 팝업에서 bool만 받아온다
+    final bool? confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => ChangeNamePopUp(
-        newName: newName,
-        onConfirm: () {
-          Navigator.of(context).pop(); // 팝업 닫기
-
-          // 실제 데이터 업데이트
-          widget.user.userName = newName;
-
-          if (currentUser.id == widget.user.id) {
-            currentUser.userName = newName;
-          }
-
-          final mapUser = usersById[widget.user.id];
-          if (mapUser != null) {
-            mapUser.userName = newName;
-          }
-
-          // 이전 페이지로 값 전달
-          Navigator.of(context).pop(newName);
-        },
-        onCancel: () {
-          Navigator.of(context).pop(); // 팝업만 닫기
-        },
-      ),
+      builder: (_) => ChangeNamePopUp(newName: newName),
     );
+
+    // 취소 또는 바깥 눌러서 닫힌 경우
+    if (confirmed != true) return;
+
+    // 2) 실제 데이터 업데이트
+    widget.user.userName = newName;
+
+    if (currentUser.id == widget.user.id) {
+      currentUser.userName = newName;
+    }
+
+    final mapUser = usersById[widget.user.id];
+    if (mapUser != null) {
+      mapUser.userName = newName;
+    }
+
+    // 3) 이전 페이지로 값 전달 (pop 한 번만)
+    Navigator.of(context).pop(newName);
   }
 
   @override

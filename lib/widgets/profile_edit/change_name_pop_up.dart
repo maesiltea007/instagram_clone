@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 
 class ChangeNamePopUp extends StatelessWidget {
   final String newName;
-  final VoidCallback onConfirm;
-  final VoidCallback onCancel;
 
   const ChangeNamePopUp({
     super.key,
     required this.newName,
-    required this.onConfirm,
-    required this.onCancel,
   });
 
   @override
@@ -58,7 +54,10 @@ class ChangeNamePopUp extends StatelessWidget {
 
           // Change name 버튼
           InkWell(
-            onTap: onConfirm,
+            onTap: () {
+              // 확인: true 리턴
+              Navigator.of(context).pop(true);
+            },
             child: Container(
               alignment: Alignment.center,
               height: 48,
@@ -77,7 +76,10 @@ class ChangeNamePopUp extends StatelessWidget {
 
           // Cancel 버튼
           InkWell(
-            onTap: onCancel,
+            onTap: () {
+              // 취소: false 리턴
+              Navigator.of(context).pop(false);
+            },
             child: Container(
               alignment: Alignment.center,
               height: 48,

@@ -22,6 +22,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   static bool _hasShownPopup = false;
 
   late String _profileImagePath;
+  bool _changed = false; // ★ 여기: 뭔가 수정했는지 여부
 
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         onImageSelected: (newPath) {
           setState(() {
             _profileImagePath = newPath;
+            _changed = true; // ★ 변경됨 표시
 
             // 더미 데이터 직접 수정
             currentUser.profileImagePath = newPath;
@@ -74,6 +76,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (newName != null && newName.isNotEmpty) {
       setState(() {
         // ChangeNamePage 안에서 user.userName, 더미 데이터 이미 수정됨
+        _changed = true; // ★ 이름 바뀜
       });
     }
   }
@@ -91,119 +94,135 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (newBio != null) {
       setState(() {
         // ChangeBioPage 안에서 user.bio, 더미 데이터 이미 수정됨
+        _changed = true; // ★ bio 바뀜
       });
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    // 뒤로가기 / 제스처로 나갈 때도 변경 여부 넘겨주기
+    Navigator.of(context).pop(_changed);
+    return false; // 우리가 직접 pop 했으니 기본 pop 막기
   }
 
   @override
   Widget build(BuildContext context) {
     final user = widget.user;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0.4,
-        title: const Text(
-          'Edit profile',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0.4,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop(_changed); // ★ AppBar 뒤로가기도 결과 반환
+            },
           ),
-        ),
-      ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const SizedBox(height: 12),
-
-          // ───────── PROFILE PHOTO ─────────
-          Center(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 84,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: _openProfilePhotoSheet,
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage: AssetImage(_profileImagePath),
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFD8D8D8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person,
-                          size: 32,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 6),
-                GestureDetector(
-                  onTap: _openProfilePhotoSheet,
-                  child: const Text(
-                    'Change profile picture',
-                    style: TextStyle(
-                      color: Color(0xFF385898),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+          title: const Text(
+            'Edit profile',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
             ),
           ),
+        ),
+        body: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const SizedBox(height: 12),
 
-          const SizedBox(height: 10),
+            // ───────── PROFILE PHOTO ─────────
+            Center(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 84,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: _openProfilePhotoSheet,
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: AssetImage(_profileImagePath),
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFD8D8D8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: _openProfilePhotoSheet,
+                    child: const Text(
+                      'Change profile picture',
+                      style: TextStyle(
+                        color: Color(0xFF385898),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-          // ───────── 실제 유저 정보 필드 ─────────
-          _buildFieldBlock(
-            "Name",
-            user.userName,
-            onTap: () => _openChangeNamePage(user),
-          ),
-          _buildFieldBlock("Username", user.userNickName),
-          _buildFieldBlock("Pronouns", ""),
-          _buildFieldBlock(
-            "Bio",
-            user.bio,
-            onTap: () => _openChangeBioPage(user), // ★ Bio 편집 연결
-          ),
+            const SizedBox(height: 10),
 
-          _buildSectionItem("Add link"),
-          _buildSectionItem("Add banners"),
+            // ───────── 실제 유저 정보 필드 ─────────
+            _buildFieldBlock(
+              "Name",
+              user.userName,
+              onTap: () => _openChangeNamePage(user),
+            ),
+            _buildFieldBlock("Username", user.userNickName),
+            _buildFieldBlock("Pronouns", ""),
+            _buildFieldBlock(
+              "Bio",
+              user.bio,
+              onTap: () => _openChangeBioPage(user),
+            ),
 
-          _buildFieldTitle("Gender"),
-          _buildSectionItemWithArrow("Prefer not to say"),
+            _buildSectionItem("Add link"),
+            _buildSectionItem("Add banners"),
 
-          _buildSectionItemWithTrailing(
-            "Music",
-            trailing: "Add music to your profile",
-          ),
+            _buildFieldTitle("Gender"),
+            _buildSectionItemWithArrow("Prefer not to say"),
 
-          const SizedBox(height: 10),
+            _buildSectionItemWithTrailing(
+              "Music",
+              trailing: "Add music to your profile",
+            ),
 
-          _buildBigButton("Switch to professional account"),
-          _buildDivider(),
-          _buildBigButton("Personal information settings"),
-          _buildDivider(),
+            const SizedBox(height: 10),
 
-          const SizedBox(height: 40),
-        ],
+            _buildBigButton("Switch to professional account"),
+            _buildDivider(),
+            _buildBigButton("Personal information settings"),
+            _buildDivider(),
+
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
