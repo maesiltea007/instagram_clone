@@ -3,6 +3,7 @@ import 'package:instagram/data/dummy_notifications.dart';
 import 'package:instagram/data/dummy_users.dart';
 
 import '../models/notification_item.dart';
+import 'only_one_post.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -45,6 +46,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         centerTitle: false,
       ),
+
       body: items.isEmpty
           ? const Center(
         child: Text(
@@ -64,130 +66,143 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
           const SizedBox(height: 12),
 
-          // 인스타처럼 카드 하나씩
-          for (final n in items) _buildNotificationTile(n),
+          // 알림 타일들
+          for (final n in items) _buildNotificationTile(context, n),
         ],
       ),
     );
   }
 
-  Widget _buildNotificationTile(NotificationItem n) {
+  Widget _buildNotificationTile(BuildContext context, NotificationItem n) {
     final user = usersById[n.fromUserId];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F9FE),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      child: Row(
-        children: [
-          // 왼쪽 프로필 + 스토리 링
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFFDE0046),
-                      Color(0xFFF7A34B),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 42,
-                height: 42,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: CircleAvatar(
-                  backgroundImage: AssetImage(
-                    user?.profileImagePath ??
-                        'assets/images/profile_images/default_user_image.jpg',
-                  ),
-                ),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OnlyOnePostPage(
+              postId: n.postId,
+              autoOpenComments: true,   // ★ 추가
+            ),
           ),
-          const SizedBox(width: 10),
-
-          // 가운데 텍스트
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F9FE),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: [
+            // 왼쪽 프로필 + 스토리 링
+            Stack(
+              alignment: Alignment.center,
               children: [
-                RichText(
-                  text: TextSpan(
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFDE0046),
+                        Color(0xFFF7A34B),
+                      ],
                     ),
-                    children: [
-                      TextSpan(
-                        text: user?.userNickName ?? 'someone',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(
+                      user?.profileImagePath ??
+                          'assets/images/profile_images/default_user_image.jpg',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(width: 10),
+
+            // 가운데 텍스트
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: user?.userNickName ?? 'someone',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
+                        const TextSpan(text: ' commented: '),
+                        TextSpan(
+                          text: n.text,
+                        ),
+                        const TextSpan(text: '  '),
+                        TextSpan(
+                          text: _timeAgoShort(n.createdAt),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  Row(
+                    children: const [
+                      Icon(
+                        Icons.favorite_border,
+                        size: 14,
+                        color: Colors.grey,
                       ),
-                      const TextSpan(text: ' commented: '),
-                      TextSpan(
-                        text: n.text,
-                      ),
-                      const TextSpan(text: '  '),
-                      TextSpan(
-                        text: _timeAgoShort(n.createdAt),
-                        style: const TextStyle(
+                      SizedBox(width: 4),
+                      Text(
+                        'Reply',
+                        style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 4),
-
-                // 하단 작은 하트 + Reply
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.favorite_border,
-                      size: 14,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      'Reply',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(width: 8),
+            const SizedBox(width: 8),
 
-          // 오른쪽 썸네일 (내 게시물 이미지 역할)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/dummy_device/images/puang_happy.jpg',
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+            // 오른쪽 썸네일
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/dummy_device/images/puang_happy.jpg',
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
