@@ -3,7 +3,9 @@ import 'package:instagram/models/dm_thread.dart';
 import 'package:instagram/models/dm_message.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/data/dummy_dm_messages.dart';
+import 'package:instagram/dm_bot/api_function.dart'; // ★ 봇 호출용
 
+import '../data/dummy_dm_threads.dart';
 import '../widgets/dm/dm_media_picker_bottom_sheet.dart';
 
 class DmMessagePage extends StatefulWidget {
@@ -24,6 +26,7 @@ class _DmMessagePageState extends State<DmMessagePage> {
 
   List<DmMessage> _messages = [];
   bool _hasText = false; // 입력 여부
+  bool _isBotTyping = false; // ★ 봇 타이핑 상태
 
   @override
   void initState() {
@@ -61,17 +64,19 @@ class _DmMessagePageState extends State<DmMessagePage> {
   }
 
   // 텍스트 DM 보내기
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
+    final now = DateTime.now();
+
     final msg = DmMessage(
-      messageId: 'local_${DateTime.now().millisecondsSinceEpoch}',
+      messageId: 'local_${now.millisecondsSinceEpoch}',
       threadId: widget.thread.threadId,
       type: DmMessageType.text,
       text: text,
       mediaPath: null,
-      createdAt: DateTime.now(),
+      createdAt: now,
       isMine: true,
     );
 
@@ -81,27 +86,96 @@ class _DmMessagePageState extends State<DmMessagePage> {
       final list =
           dmMessagesByThreadId[widget.thread.threadId] ?? <DmMessage>[];
       dmMessagesByThreadId[widget.thread.threadId] = [...list, msg];
+
+      // thread 리스트도 갱신
+      for (final t in dummyDmThreads) {
+        if (t.threadId == widget.thread.threadId) {
+          t.lastMessageText = text;
+          t.lastMessageTime = now;
+          t.isSeen = false;
+        }
+      }
 
       _controller.clear();
       _hasText = false;
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      }
-    });
+    _scrollToBottom();
+
+    // ★ 봇 계정(10, 11)일 때만 답장
+    if (widget.thread.peerUserId == '10' || widget.thread.peerUserId == '11') {
+      _triggerBotReply(text);
+    }
   }
 
-  // 이미지 DM 보내기
+  // 봇 답장 생성
+  Future<void> _triggerBotReply(String userText) async {
+    // 이미 dispose 됐으면 중단
+    if (!mounted) return;
+
+    setState(() {
+      _isBotTyping = true;
+    });
+    _scrollToBottom();
+
+    String botText;
+    try {
+      botText = await sendDMtoAI(userText);
+      botText = botText.trim();
+      if (botText.isEmpty) {
+        botText = '...';
+      }
+    } catch (_) {
+      // 실패해도 과제 시연용이니까 대충 한 줄 넣어줌
+      botText = 'Got it 👍';
+    }
+
+    if (!mounted) return;
+
+    final now = DateTime.now();
+
+    final botMsg = DmMessage(
+      messageId: 'bot_${now.millisecondsSinceEpoch}',
+      threadId: widget.thread.threadId,
+      type: DmMessageType.text,
+      text: botText,
+      mediaPath: null,
+      createdAt: now,
+      isMine: false,
+    );
+
+    setState(() {
+      _isBotTyping = false;
+      _messages.add(botMsg);
+
+      final list =
+          dmMessagesByThreadId[widget.thread.threadId] ?? <DmMessage>[];
+      dmMessagesByThreadId[widget.thread.threadId] = [...list, botMsg];
+
+      // thread 리스트 갱신
+      for (final t in dummyDmThreads) {
+        if (t.threadId == widget.thread.threadId) {
+          t.lastMessageText = botText;
+          t.lastMessageTime = now;
+          t.isSeen = false;
+        }
+      }
+    });
+
+    _scrollToBottom();
+  }
+
+  // 이미지 DM 보내기 (봇 응답은 없음)
   void _sendImageMessage(String imagePath) {
+    final now = DateTime.now();
+
     final msg = DmMessage(
-      messageId: 'local_img_${DateTime.now().millisecondsSinceEpoch}',
+      messageId: 'local_img_${now.millisecondsSinceEpoch}',
       threadId: widget.thread.threadId,
       type: DmMessageType.image,
       text: null,
       mediaPath: imagePath,
-      createdAt: DateTime.now(),
+      createdAt: now,
       isMine: true,
     );
 
@@ -111,8 +185,20 @@ class _DmMessagePageState extends State<DmMessagePage> {
       final list =
           dmMessagesByThreadId[widget.thread.threadId] ?? <DmMessage>[];
       dmMessagesByThreadId[widget.thread.threadId] = [...list, msg];
+
+      for (final t in dummyDmThreads) {
+        if (t.threadId == widget.thread.threadId) {
+          t.lastMessageText = '[Photo]';
+          t.lastMessageTime = now;
+          t.isSeen = false;
+        }
+      }
     });
 
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -180,8 +266,54 @@ class _DmMessagePageState extends State<DmMessagePage> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: _messages.length,
+              itemCount: _messages.length + (_isBotTyping ? 1 : 0),
               itemBuilder: (context, index) {
+                // ★ 마지막 아이템이 typing 버블인 경우
+                if (_isBotTyping && index == _messages.length) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding:
+                          const EdgeInsets.only(right: 6, bottom: 2),
+                          child: CircleAvatar(
+                            radius: 12,
+                            backgroundImage: AssetImage(
+                              peer?.profileImagePath ?? '',
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(18),
+                            ),
+                          ),
+                          child: const Text(
+                            '...',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 final msg = _messages[index];
                 final isMine = msg.isMine;
 
@@ -226,10 +358,12 @@ class _DmMessagePageState extends State<DmMessagePage> {
                             child: Container(
                               margin: const EdgeInsets.symmetric(vertical: 4),
                               padding: EdgeInsets.symmetric(
-                                horizontal:
-                                msg.type == DmMessageType.image ? 0 : 12,
-                                vertical:
-                                msg.type == DmMessageType.image ? 0 : 8,
+                                horizontal: msg.type == DmMessageType.image
+                                    ? 0
+                                    : 12,
+                                vertical: msg.type == DmMessageType.image
+                                    ? 0
+                                    : 8,
                               ),
                               decoration: BoxDecoration(
                                 color: msg.type == DmMessageType.image
@@ -253,7 +387,7 @@ class _DmMessagePageState extends State<DmMessagePage> {
                         ],
                       ),
                     ),
-                    if (!isMine && index == _messages.length - 1)
+                    if (!isMine && index == _messages.length - 1 && !_isBotTyping)
                       Padding(
                         padding: const EdgeInsets.only(top: 2, bottom: 6),
                         child: Align(
@@ -393,7 +527,6 @@ class _DmMessagePageState extends State<DmMessagePage> {
                                 builder: (sheetContext) =>
                                     DmMediaPickerBottomSheet(
                                       onSelect: (imagePath) {
-                                        // 여기서는 pop 안 하고, 바텀시트 안에서 pop
                                         _sendImageMessage(imagePath);
                                       },
                                     ),

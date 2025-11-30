@@ -32,7 +32,7 @@ final List<DmMessage> dummyDmMessages = [
 
   // t2 준혁
   DmMessage(
-    messageId: 'm3',
+    messageId: 'm4',
     threadId: 't2',
     type: DmMessageType.text,
     text: 'Perfect!',
@@ -40,7 +40,7 @@ final List<DmMessage> dummyDmMessages = [
     isMine: false,
   ),
   DmMessage(
-    messageId: 'm4',
+    messageId: 'm5',
     threadId: 't2',
     type: DmMessageType.text,
     text: 'Hi!!',
