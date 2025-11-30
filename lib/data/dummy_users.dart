@@ -22,7 +22,7 @@ final Map<String, User> usersById = {
 //유저 더미 데이터
 
 //본인
-const User user0 = User(
+User user0 = User(
   id: '0',
   userNickName: 'ta_junhyuk',
   userName: 'puang',
@@ -34,7 +34,7 @@ const User user0 = User(
 );
 
 //에스파
-const User user1 = User(
+User user1 = User(
   id: '1',
   userNickName: 'aespa_official',
   userName: 'Aespa',
@@ -46,7 +46,7 @@ const User user1 = User(
 );
 
 //카리나
-const User user2 = User(
+User user2 = User(
   id: '2',
   userNickName: 'katarinabluu',
   userName: 'Karina',
@@ -58,7 +58,7 @@ const User user2 = User(
 );
 
 //킹샷모바일
-const User user3 = User(
+User user3 = User(
   id: '3',
   userNickName: 'kingshot_mobile',
   userName: 'kingshot_mobile',
@@ -70,7 +70,7 @@ const User user3 = User(
 );
 
 //악뮤 수현
-const User user4 = User(
+User user4 = User(
   id: '4',
   userNickName: 'akmu_suhyun',
   userName: 'suhyun',
@@ -82,7 +82,7 @@ const User user4 = User(
 );
 
 //호텔스 닷컴 광고계정
-const User user5 = User(
+User user5 = User(
   id: '5',
   userNickName: 'hotelsdotcom',
   userName: 'hotel',
@@ -94,7 +94,7 @@ const User user5 = User(
 );
 
 //윈터 계정
-const User user6 = User(
+User user6 = User(
   id: '6',
   userNickName: 'imwinter',
   userName: 'winter',
@@ -106,7 +106,7 @@ const User user6 = User(
 );
 
 //춤추는 영상에 댓글 다는 계정
-const User user7 = User(
+User user7 = User(
   id: '7',
   userNickName: 'aespa_fan',
   userName: 'comment',
@@ -118,7 +118,7 @@ const User user7 = User(
 );
 
 //카리나 사진에 댓글 다는 계정
-const User user8 = User(
+User user8 = User(
   id: '8',
   userNickName: 'karina_fan',
   userName: 'comment',
@@ -130,7 +130,7 @@ const User user8 = User(
 );
 
 //윈터 사진에 댓글 다는 계정
-const User user9 = User(
+User user9 = User(
   id: '9',
   userNickName: 'winter_fan',
   userName: 'comment',
@@ -142,7 +142,7 @@ const User user9 = User(
 );
 
 //내 게시물에 댓글 다는 계정, 나랑 DM 하는 계정
-const User user10 = User(
+User user10 = User(
   id: '10',
   userNickName: 'haetbaaaan',
   userName: 'shin',
@@ -154,7 +154,7 @@ const User user10 = User(
 );
 
 //나랑 DM하는 계정
-const User user11 = User(
+User user11 = User(
   id: '11',
   userNickName: 'junhyuk_choi',
   userName: 'choi',

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/user.dart';
 import 'package:instagram/widgets/profile_edit/profile_edit_pop_up_1.dart';
+import 'package:instagram/widgets/profile_edit/profile_photo_bottom_sheet.dart';
+import 'package:instagram/data/dummy_users.dart'; // currentUser, usersById
 
 class EditProfilePage extends StatefulWidget {
-  final User user; // ★ 프로필 정보
+  final User user;
 
   const EditProfilePage({
     super.key,
@@ -15,20 +17,46 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  // 앱 실행 중에 이 페이지에서 팝업을 이미 한 번 보여줬는지
   static bool _hasShownPopup = false;
+
+  late String _profileImagePath; // 현재 페이지에서 쓰는 프로필 이미지 경로
 
   @override
   void initState() {
     super.initState();
 
-    // 처음 진입한 경우에만 팝업
+    _profileImagePath = widget.user.profileImagePath;
+
     if (!_hasShownPopup) {
       _hasShownPopup = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showProfileEditPopup1(context);
       });
     }
+  }
+
+  void _openProfilePhotoSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => ProfilePhotoBottomSheet(
+        profileImagePath: _profileImagePath,
+        onImageSelected: (newPath) {
+          setState(() {
+            _profileImagePath = newPath;
+
+            // ★ 실제 더미 데이터 직접 수정 (copyWith 제거 버전)
+            currentUser.profileImagePath = newPath;
+
+            final user = usersById[currentUser.id];
+            if (user != null) {
+              user.profileImagePath = newPath;
+            }
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -62,11 +90,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        // ★ 실제 유저 프로필 이미지
-                        backgroundImage: AssetImage(
-                          widget.user.profileImagePath,
+                      GestureDetector(
+                        onTap: _openProfilePhotoSheet,
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: AssetImage(_profileImagePath),
                         ),
                       ),
                       const SizedBox(width: 24),
@@ -87,12 +115,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Change profile picture',
-                  style: TextStyle(
-                    color: Color(0xFF385898),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                GestureDetector(
+                  onTap: _openProfilePhotoSheet,
+                  child: const Text(
+                    'Change profile picture',
+                    style: TextStyle(
+                      color: Color(0xFF385898),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
