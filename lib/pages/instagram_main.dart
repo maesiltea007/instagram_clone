@@ -113,7 +113,14 @@ class _InstagramMainState extends State<InstagramMain> {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  setState(() => _currentIndex = 4);
+                  if (_currentIndex == 4) {
+                    // 이미 프로필 탭이면: nested navigator 스택을 루트까지 pop
+                    _profileNavigatorKey.currentState
+                        ?.popUntil((route) => route.isFirst);
+                  } else {
+                    // 다른 탭이면: 프로필 탭으로 전환
+                    setState(() => _currentIndex = 4);
+                  }
                 },
                 child: Container(
                   color: Colors.transparent,
