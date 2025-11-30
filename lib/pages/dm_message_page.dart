@@ -4,6 +4,8 @@ import 'package:instagram/models/dm_message.dart';
 import 'package:instagram/data/dummy_users.dart';
 import 'package:instagram/data/dummy_dm_messages.dart';
 
+import '../widgets/dm/dm_media_picker_bottom_sheet.dart';
+
 class DmMessagePage extends StatefulWidget {
   final DmThread thread;
 
@@ -327,14 +329,28 @@ class _DmMessagePageState extends State<DmMessagePage> {
                     child: Opacity(
                       opacity: _hasText ? 0 : 1,
                       child: Row(
-                        children: const [
-                          Icon(Icons.mic_none, size: 22),
-                          SizedBox(width: 8),
-                          Icon(Icons.image_outlined, size: 22),
-                          SizedBox(width: 8),
-                          Icon(Icons.emoji_emotions_outlined, size: 22),
-                          SizedBox(width: 8),
-                          Icon(Icons.add, size: 22),
+                        children: [
+                          const Icon(Icons.mic_none, size: 22),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) => DmMediaPickerBottomSheet(
+                                  onSelect: (imagePath) {
+                                    // TODO: imagePath로 이미지 DM 보내는 로직 (지금은 텍스트만 있으니까 나중에 추가)
+                                  },
+                                ),
+                              );
+                            },
+                            child: const Icon(Icons.image_outlined, size: 22),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.emoji_emotions_outlined, size: 22),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.add, size: 22),
                         ],
                       ),
                     ),
