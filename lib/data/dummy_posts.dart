@@ -86,6 +86,7 @@ final List<Post> dummyPosts = [
     createdAt: DateTime(2025, 10, 20),
   ),
 
+
   //내  포스트 - 코딩화면
   Post(
     id: '7',
@@ -96,6 +97,7 @@ final List<Post> dummyPosts = [
     ],
     likeCount: 77,
     createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
   ),
 
   //내 포스트 - 태블릿 박스
@@ -108,7 +110,14 @@ final List<Post> dummyPosts = [
     ],
     likeCount: 77,
     createdAt: DateTime(2025, 10, 20),
+    showFeed: false,
   ),
+
+
+
+
+
+
 ];
 
 

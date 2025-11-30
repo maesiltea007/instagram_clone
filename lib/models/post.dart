@@ -9,6 +9,7 @@ class Post {
   final bool isVideo;
   final int likeCount;
   final DateTime createdAt;
+  final bool showFeed;
 
   const Post({
     required this.id,
@@ -18,5 +19,6 @@ class Post {
     this.isVideo = false,
     this.likeCount = 0,
     required this.createdAt,
+    this.showFeed = true,
   });
 }
