@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/models/dm_thread.dart';
 import 'package:instagram/models/dm_message.dart';
 import 'package:instagram/data/dummy_users.dart';
-import 'package:instagram/data/dummy_dm_messages.dart'; // dmMessagesByThreadId 같은 맵 있다고 가정
+import 'package:instagram/data/dummy_dm_messages.dart';
 
 class DmMessagePage extends StatefulWidget {
   final DmThread thread;
@@ -19,14 +19,21 @@ class DmMessagePage extends StatefulWidget {
 class _DmMessagePageState extends State<DmMessagePage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  bool get _hasText => _controller.text.trim().isNotEmpty;
 
   List<DmMessage> _messages = [];
+  bool _hasText = false; // 입력 여부
 
   @override
   void initState() {
     super.initState();
     _loadMessages();
+
+    // 처음 열릴 때 맨 아래로 스크롤
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   void _loadMessages() {
@@ -40,6 +47,15 @@ class _DmMessagePageState extends State<DmMessagePage> {
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged(String value) {
+    final hasTextNow = value.trim().isNotEmpty;
+    if (hasTextNow != _hasText) {
+      setState(() {
+        _hasText = hasTextNow;
+      });
+    }
   }
 
   void _sendMessage() {
@@ -57,15 +73,14 @@ class _DmMessagePageState extends State<DmMessagePage> {
     setState(() {
       _messages.add(msg);
 
-      // 더미 스토어에도 반영 (원하면)
       final list =
           dmMessagesByThreadId[widget.thread.threadId] ?? <DmMessage>[];
       dmMessagesByThreadId[widget.thread.threadId] = [...list, msg];
 
       _controller.clear();
+      _hasText = false;
     });
 
-    // 맨 아래로 스크롤
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -137,7 +152,6 @@ class _DmMessagePageState extends State<DmMessagePage> {
                 final msg = _messages[index];
                 final isMine = msg.isMine;
 
-                // 날짜 라벨 (이전 메시지랑 날짜가 바뀔 때만)
                 final showDateLabel = index == 0 ||
                     !_isSameDay(
                       _messages[index - 1].createdAt,
@@ -184,15 +198,15 @@ class _DmMessagePageState extends State<DmMessagePage> {
                               ),
                               decoration: BoxDecoration(
                                 color: isMine
-                                    ? const Color(0xFF8338FF) // 보라색 말풍선 느낌
+                                    ? const Color(0xFF8338FF)
                                     : const Color(0xFFF0F0F0),
                                 borderRadius: BorderRadius.only(
                                   topLeft: const Radius.circular(18),
                                   topRight: const Radius.circular(18),
-                                  bottomLeft: Radius.circular(
-                                      isMine ? 18 : 4), // 인스타 느낌 비슷하게
-                                  bottomRight: Radius.circular(
-                                      isMine ? 4 : 18),
+                                  bottomLeft:
+                                  Radius.circular(isMine ? 18 : 4),
+                                  bottomRight:
+                                  Radius.circular(isMine ? 4 : 18),
                                 ),
                               ),
                               child: Text(
@@ -208,7 +222,6 @@ class _DmMessagePageState extends State<DmMessagePage> {
                         ],
                       ),
                     ),
-                    // 맨 마지막 상대 메시지 아래 "Tap and hold to react" 흉내
                     if (!isMine && index == _messages.length - 1)
                       Padding(
                         padding: const EdgeInsets.only(top: 2, bottom: 6),
@@ -229,13 +242,13 @@ class _DmMessagePageState extends State<DmMessagePage> {
             ),
           ),
 
-          // 입력 영역
           _buildInputBar(),
         ],
       ),
     );
   }
 
+  // 하단 입력 바
   // 하단 입력 바
   Widget _buildInputBar() {
     return SafeArea(
@@ -246,89 +259,114 @@ class _DmMessagePageState extends State<DmMessagePage> {
           color: Colors.white,
           border: Border(top: BorderSide(color: Color(0xFFE0E0E0))),
         ),
-        child: ValueListenableBuilder<TextEditingValue>(
-          valueListenable: _controller,
-          builder: (context, value, _) {
-            final hasText = value.text.trim().isNotEmpty;
+        child: Row(
+          children: [
+            // 왼쪽: 카메라 아이콘 영역 (항상 같은 폭)
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: Opacity(
+                opacity: _hasText ? 0 : 1,
+                child: _buildCameraCircle(),
+              ),
+            ),
 
-            return Row(
-              children: [
-                // ───── 왼쪽 아이콘 부분 ─────
-                if (!hasText)
-                  _buildCameraCircle()                 // 카메라 동그라미
-                else
-                  const SizedBox(width: 34),           // 자리 맞추기용
+            const SizedBox(width: 8),
 
-                const SizedBox(width: 8),
-
-                // ───── 가운데 텍스트 필드 ─────
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
+            // 가운데: 텍스트 입력 필드
+            Expanded(
+              child: Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F1F1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  controller: _controller,
+                  minLines: 1,
+                  maxLines: 4,
+                  onChanged: _onTextChanged,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8,
                     ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F1F1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: 'Message...',
-                        border: InputBorder.none,
-                        // 텍스트 있을 때만 돋보기 아이콘
-                        prefixIcon: hasText
-                            ? const Icon(
-                          Icons.search,
-                          size: 18,
-                          color: Colors.grey,
-                        )
-                            : null,
-                      ),
+                    hintText: 'Message...',
+                    border: InputBorder.none,
+                    // 텍스트 있을 때만 돋보기 아이콘
+                    prefixIcon: _hasText
+                        ? const Icon(
+                      Icons.search,
+                      size: 18,
+                      color: Colors.grey,
+                    )
+                        : null,
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                      maxWidth: 32,
+                      maxHeight: 32,
                     ),
                   ),
                 ),
+              ),
+            ),
 
-                const SizedBox(width: 8),
+            const SizedBox(width: 8),
 
-                // ───── 오른쪽 아이콘/버튼 부분 ─────
-                if (!hasText)
-                  Row(
-                    children: const [
-                      Icon(Icons.mic_none, size: 22),
-                      SizedBox(width: 8),
-                      Icon(Icons.image_outlined, size: 22),
-                      SizedBox(width: 8),
-                      Icon(Icons.emoji_emotions_outlined, size: 22),
-                      SizedBox(width: 8),
-                      Icon(Icons.add, size: 22),
-                    ],
-                  )
-                else
-                // 종이비행기(전송) 버튼
-                  InkWell(
-                    onTap: _sendMessage,
-                    borderRadius: BorderRadius.circular(999),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF8338FF),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.send,
-                        size: 18,
-                        color: Colors.white,
+            // 오른쪽: 툴 아이콘들 vs 종이비행기 (레이아웃 유지)
+            SizedBox(
+              height: 34,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 툴 아이콘 묶음
+                  IgnorePointer(
+                    ignoring: _hasText,
+                    child: Opacity(
+                      opacity: _hasText ? 0 : 1,
+                      child: Row(
+                        children: const [
+                          Icon(Icons.mic_none, size: 22),
+                          SizedBox(width: 8),
+                          Icon(Icons.image_outlined, size: 22),
+                          SizedBox(width: 8),
+                          Icon(Icons.emoji_emotions_outlined, size: 22),
+                          SizedBox(width: 8),
+                          Icon(Icons.add, size: 22),
+                        ],
                       ),
                     ),
                   ),
-              ],
-            );
-          },
+
+                  // 종이비행기 버튼
+                  IgnorePointer(
+                    ignoring: !_hasText,
+                    child: Opacity(
+                      opacity: _hasText ? 1 : 0,
+                      child: InkWell(
+                        onTap: _hasText ? _sendMessage : null,
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF8338FF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.send,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -350,7 +388,6 @@ class _DmMessagePageState extends State<DmMessagePage> {
     );
   }
 
-  // 오늘 / 날짜 라벨
   String _fullTimeLabel(DateTime t) {
     final now = DateTime.now();
     final isToday =
