@@ -19,6 +19,9 @@ class OthersProfilePage extends StatefulWidget {
 class _OthersProfilePageState extends State<OthersProfilePage> {
   OverlayEntry? _postOverlay;
 
+  // 팔로우 버튼 눌렀을 때만 Suggested 섹션 보이게
+  bool _showSuggested = false;
+
   int _getPostCountFor(User user) {
     return dummyPosts.where((p) => p.authorid == user.id).length;
   }
@@ -60,6 +63,13 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
             _buildUserInfo(user),
             const SizedBox(height: 12),
             _buildButtonsRow(user),
+
+            // ★ 팔로우 버튼을 눌러서 _showSuggested 가 true가 되면 여기 표시
+            if (_showSuggested) ...[
+              const SizedBox(height: 12),
+              _buildSuggestedForYou(),
+            ],
+
             const SizedBox(height: 16),
             _buildPostsSection(user),
             const SizedBox(height: 24),
@@ -281,12 +291,14 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
               onTap: () {
                 setState(() {
                   if (amIFollowing) {
+                    // 이미 팔로잉 상태였다면 → 언팔 + 추천 숨김
                     unfollowUser(currentUser.id, user.id);
+                    _showSuggested = false;
                   } else {
+                    // 팔로우 버튼 처음 누르는 순간 → 팔로우 + 추천 보여줌
                     followUser(currentUser.id, user.id);
+                    _showSuggested = true;
                   }
-                  // currentUser / target 유저 둘 다 dummy_users 안에서 이미 변경된다고 가정
-                  // setState로 이 페이지는 즉시 리빌드
                 });
               },
               child: Container(
@@ -341,6 +353,158 @@ class _OthersProfilePageState extends State<OthersProfilePage> {
           ),
         ],
       ),
+    );
+  }
+
+  // ───────────────── Suggested for you 섹션 ─────────────────
+  Widget _buildSuggestedForYou() {
+    // 더미 데이터
+    final suggestions = [
+      {
+        'nick': 'aerichandesu',
+        'name': 'GISELLE',
+        'img': 'assets/images/profile_images/giselle_profile_image.jpg',
+      },
+      {
+        'nick': 'lalalalisa_m',
+        'name': 'LISA',
+        'img': 'assets/images/profile_images/default_user_image.jpg',
+      },
+      {
+        'nick': 'hhh.e.c.v',
+        'name': 'HONG EUNCHAE',
+        'img': 'assets/images/profile_images/default_user_image.jpg',
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 제목 줄
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: const [
+              Text(
+                'Suggested for you',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Spacer(),
+              Text(
+                'See all',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF3897F0),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        SizedBox(
+          height: 210,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: suggestions.length,
+            itemBuilder: (context, index) {
+              final s = suggestions[index];
+              return Container(
+                width: 150,
+                margin: EdgeInsets.only(right: index == suggestions.length - 1 ? 0 : 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE0E0E0),
+                    width: 1,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 4),
+                          CircleAvatar(
+                            radius: 34,
+                            backgroundImage: AssetImage(s['img']!),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            s['nick']!,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            s['name']!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 32,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFF0095F6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onPressed: () {
+                                // 더미: 아무 동작 안 함
+                              },
+                              child: const Text(
+                                'Follow',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // X 아이콘
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 18,
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          // 진짜 인스타는 카드 숨기겠지만, 여기선 더미라 안 함
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
